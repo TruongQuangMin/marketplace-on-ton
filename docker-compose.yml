@@ -1,0 +1,24 @@
+  services:
+    directus:
+      image: directus/directus:11.1.1
+      ports:
+        - 8055:8055
+      volumes:
+        - ./uploads:/directus/uploads
+        - ./extensions:/directus/extensions
+      environment:
+        SECRET: "3FB57A689E8B63D429AE9228CA63D"
+        DB_CLIENT: "pg"
+        DB_CONNECTION_STRING: "postgresql://marketplace-on-ton-db_owner:8mqlo0LvzRgY@ep-yellow-math-a5eh8hqm.us-east-2.aws.neon.tech/marketplace-on-ton-db?sslmode=require" # Địa chỉ host từ Neon.tech
+
+        
+        # Tắt cache
+        CACHE_ENABLED: "false"
+        CACHE_AUTO_PURGE: "false"
+        # CACHE_STORE: "redis"
+
+        ADMIN_EMAIL: "admin@example.com"
+        ADMIN_PASSWORD: "1234"
+        
+        # Đặt PUBLIC_URL nếu cần
+        # PUBLIC_URL: "https://directus.example.com"
