@@ -7,6 +7,21 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model carts {
+  id                                                String          @id @db.Uuid
+  user_created                                      String          @db.Uuid
+  date_created                                      DateTime        @db.Timestamptz(6)
+  user_updated                                      String?         @db.Uuid
+  date_updated                                      DateTime?       @db.Timestamptz(6)
+  user_id                                           String          @db.Uuid
+  product_id                                        String          @db.Uuid
+  amount                                            Int
+  products                                          products        @relation(fields: [product_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "carts_product_id_foreign")
+  directus_users_carts_user_createdTodirectus_users directus_users  @relation("carts_user_createdTodirectus_users", fields: [user_created], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "carts_user_created_foreign")
+  directus_users_carts_user_idTodirectus_users      directus_users  @relation("carts_user_idTodirectus_users", fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "carts_user_id_foreign")
+  directus_users_carts_user_updatedTodirectus_users directus_users? @relation("carts_user_updatedTodirectus_users", fields: [user_updated], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "carts_user_updated_foreign")
+}
+
 model directus_access {
   id                String            @id @db.Uuid
   role              String?           @db.Uuid
@@ -421,16 +436,9 @@ model directus_users {
   theme_light                                                             String?                  @db.VarChar(255)
   theme_light_overrides                                                   Json?                    @db.Json
   theme_dark_overrides                                                    Json?                    @db.Json
-  Settings_Settings_user_createdTodirectus_users                          Settings[]               @relation("Settings_user_createdTodirectus_users")
-  Settings_Settings_user_updatedTodirectus_users                          Settings[]               @relation("Settings_user_updatedTodirectus_users")
-  Transactrions_Transactrions_user_createdTodirectus_users                Transactrions[]          @relation("Transactrions_user_createdTodirectus_users")
-  Transactrions_Transactrions_user_updatedTodirectus_users                Transactrions[]          @relation("Transactrions_user_updatedTodirectus_users")
-  Users_Users_user_createdTodirectus_users                                Users[]                  @relation("Users_user_createdTodirectus_users")
-  Users_Users_user_updatedTodirectus_users                                Users[]                  @relation("Users_user_updatedTodirectus_users")
-  Wishlists_Wishlists_user_createdTodirectus_users                        Wishlists[]              @relation("Wishlists_user_createdTodirectus_users")
-  Wishlists_Wishlists_user_updatedTodirectus_users                        Wishlists[]              @relation("Wishlists_user_updatedTodirectus_users")
-  cards_cards_user_createdTodirectus_users                                cards[]                  @relation("cards_user_createdTodirectus_users")
-  cards_cards_user_updatedTodirectus_users                                cards[]                  @relation("cards_user_updatedTodirectus_users")
+  carts_carts_user_createdTodirectus_users                                carts[]                  @relation("carts_user_createdTodirectus_users")
+  carts_carts_user_idTodirectus_users                                     carts[]                  @relation("carts_user_idTodirectus_users")
+  carts_carts_user_updatedTodirectus_users                                carts[]                  @relation("carts_user_updatedTodirectus_users")
   directus_access                                                         directus_access[]
   directus_dashboards                                                     directus_dashboards[]
   directus_files_directus_files_modified_byTodirectus_users               directus_files[]         @relation("directus_files_modified_byTodirectus_users")
@@ -447,9 +455,18 @@ model directus_users {
   directus_versions_directus_versions_user_createdTodirectus_users        directus_versions[]      @relation("directus_versions_user_createdTodirectus_users")
   directus_versions_directus_versions_user_updatedTodirectus_users        directus_versions[]      @relation("directus_versions_user_updatedTodirectus_users")
   orders_orders_user_createdTodirectus_users                              orders[]                 @relation("orders_user_createdTodirectus_users")
+  orders_orders_user_idTodirectus_users                                   orders[]                 @relation("orders_user_idTodirectus_users")
   orders_orders_user_updatedTodirectus_users                              orders[]                 @relation("orders_user_updatedTodirectus_users")
   products_products_user_createdTodirectus_users                          products[]               @relation("products_user_createdTodirectus_users")
   products_products_user_updatedTodirectus_users                          products[]               @relation("products_user_updatedTodirectus_users")
+  settings_settings_user_createdTodirectus_users                          settings[]               @relation("settings_user_createdTodirectus_users")
+  settings_settings_user_updatedTodirectus_users                          settings[]               @relation("settings_user_updatedTodirectus_users")
+  transactions_transactions_user_createdTodirectus_users                  transactions[]           @relation("transactions_user_createdTodirectus_users")
+  transactions_transactions_user_idTodirectus_users                       transactions[]           @relation("transactions_user_idTodirectus_users")
+  transactions_transactions_user_updatedTodirectus_users                  transactions[]           @relation("transactions_user_updatedTodirectus_users")
+  wishlists_wishlists_user_createdTodirectus_users                        wishlists[]              @relation("wishlists_user_createdTodirectus_users")
+  wishlists_wishlists_user_idTodirectus_users                             wishlists[]              @relation("wishlists_user_idTodirectus_users")
+  wishlists_wishlists_user_updatedTodirectus_users                        wishlists[]              @relation("wishlists_user_updatedTodirectus_users")
 }
 
 model directus_versions {
@@ -484,117 +501,83 @@ model directus_webhooks {
   directus_flows                directus_flows? @relation(fields: [migrated_flow], references: [id], onUpdate: NoAction, map: "directus_webhooks_migrated_flow_foreign")
 }
 
-model products {
-  id                                                   String          @id @db.Uuid
-  user_created                                         String?         @db.Uuid
-  date_created                                         DateTime?       @db.Timestamptz(6)
-  user_updated                                         String?         @db.Uuid
-  date_updated                                         DateTime?       @db.Timestamptz(6)
-  token_id                                             String?         @db.VarChar(255)
-  name                                                 String?         @db.VarChar(255)
-  price                                                Decimal?        @db.Decimal(10, 5)
-  image                                                String?         @db.Uuid
-  quantity                                             Int?
-  type                                                 String?         @default("NFT") @db.VarChar(255)
-  creator                                              String?         @db.VarChar(255)
-  description                                          String?         @db.VarChar(255)
-  Transactrions                                        Transactrions[]
-  Wishlists                                            Wishlists[]
-  cards                                                cards[]
-  orders                                               orders[]
-  directus_files                                       directus_files? @relation(fields: [image], references: [id], onUpdate: NoAction, map: "products_image_foreign")
-  directus_users_products_user_createdTodirectus_users directus_users? @relation("products_user_createdTodirectus_users", fields: [user_created], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "products_user_created_foreign")
-  directus_users_products_user_updatedTodirectus_users directus_users? @relation("products_user_updatedTodirectus_users", fields: [user_updated], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "products_user_updated_foreign")
-}
-
-model Settings {
-  id                                                   String          @id @db.Uuid
-  user_created                                         String?         @db.Uuid
-  date_created                                         DateTime?       @db.Timestamptz(6)
-  user_updated                                         String?         @db.Uuid
-  date_updated                                         DateTime?       @db.Timestamptz(6)
-  fee                                                  String?         @db.VarChar(255)
-  project_name                                         String?         @db.VarChar(255)
-  directus_users_Settings_user_createdTodirectus_users directus_users? @relation("Settings_user_createdTodirectus_users", fields: [user_created], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "settings_user_created_foreign")
-  directus_users_Settings_user_updatedTodirectus_users directus_users? @relation("Settings_user_updatedTodirectus_users", fields: [user_updated], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "settings_user_updated_foreign")
-}
-
-model Transactrions {
-  id                                                        String          @id @db.Uuid
-  user_created                                              String?         @db.Uuid
-  date_created                                              DateTime?       @db.Timestamptz(6)
-  user_updated                                              String?         @db.Uuid
-  date_updated                                              DateTime?       @db.Timestamptz(6)
-  user_id                                                   String?         @db.Uuid
-  product_id                                                String?         @db.Uuid
-  transaction_hash                                          String?         @db.VarChar(255)
-  products                                                  products?       @relation(fields: [product_id], references: [id], onUpdate: NoAction, map: "transactrions_product_id_foreign")
-  directus_users_Transactrions_user_createdTodirectus_users directus_users? @relation("Transactrions_user_createdTodirectus_users", fields: [user_created], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "transactrions_user_created_foreign")
-  Users                                                     Users?          @relation(fields: [user_id], references: [id], onUpdate: NoAction, map: "transactrions_user_id_foreign")
-  directus_users_Transactrions_user_updatedTodirectus_users directus_users? @relation("Transactrions_user_updatedTodirectus_users", fields: [user_updated], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "transactrions_user_updated_foreign")
-}
-
-model Users {
-  id                                                String          @id @db.Uuid
-  user_created                                      String?         @db.Uuid
-  date_created                                      DateTime?       @db.Timestamptz(6)
-  user_updated                                      String?         @db.Uuid
-  date_updated                                      DateTime?       @db.Timestamptz(6)
-  email                                             String?         @db.VarChar(255)
-  password                                          String?         @db.VarChar(255)
-  phone                                             String?         @db.VarChar(255)
-  role                                              String?         @db.VarChar(255)
-  fullname                                          String?         @db.VarChar(255)
-  wallet_address                                    String?         @db.VarChar(255)
-  Transactrions                                     Transactrions[]
-  directus_users_Users_user_createdTodirectus_users directus_users? @relation("Users_user_createdTodirectus_users", fields: [user_created], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "users_user_created_foreign")
-  directus_users_Users_user_updatedTodirectus_users directus_users? @relation("Users_user_updatedTodirectus_users", fields: [user_updated], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "users_user_updated_foreign")
-  Wishlists                                         Wishlists[]
-  cards                                             cards[]
-  orders                                            orders[]
-}
-
-model Wishlists {
-  id                                                    String          @id @db.Uuid
-  user_created                                          String?         @db.Uuid
-  date_created                                          DateTime?       @db.Timestamptz(6)
-  user_updated                                          String?         @db.Uuid
-  date_updated                                          DateTime?       @db.Timestamptz(6)
-  user_id                                               String?         @db.Uuid
-  product_id                                            String?         @db.Uuid
-  products                                              products?       @relation(fields: [product_id], references: [id], onUpdate: NoAction, map: "wishlists_product_id_foreign")
-  directus_users_Wishlists_user_createdTodirectus_users directus_users? @relation("Wishlists_user_createdTodirectus_users", fields: [user_created], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "wishlists_user_created_foreign")
-  Users                                                 Users?          @relation(fields: [user_id], references: [id], onUpdate: NoAction, map: "wishlists_user_id_foreign")
-  directus_users_Wishlists_user_updatedTodirectus_users directus_users? @relation("Wishlists_user_updatedTodirectus_users", fields: [user_updated], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "wishlists_user_updated_foreign")
-}
-
-model cards {
-  id                                                String          @id @db.Uuid
-  user_created                                      String?         @db.Uuid
-  date_created                                      DateTime?       @db.Timestamptz(6)
-  user_updated                                      String?         @db.Uuid
-  date_updated                                      DateTime?       @db.Timestamptz(6)
-  product_id                                        String?         @db.Uuid
-  user_id                                           String?         @db.Uuid
-  amount                                            Int?
-  products                                          products?       @relation(fields: [product_id], references: [id], onUpdate: NoAction, map: "cards_product_id_foreign")
-  directus_users_cards_user_createdTodirectus_users directus_users? @relation("cards_user_createdTodirectus_users", fields: [user_created], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "cards_user_created_foreign")
-  Users                                             Users?          @relation(fields: [user_id], references: [id], onUpdate: NoAction, map: "cards_user_id_foreign")
-  directus_users_cards_user_updatedTodirectus_users directus_users? @relation("cards_user_updatedTodirectus_users", fields: [user_updated], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "cards_user_updated_foreign")
-}
-
 model orders {
   id                                                 String          @id @db.Uuid
-  user_created                                       String?         @db.Uuid
-  date_created                                       DateTime?       @db.Timestamptz(6)
+  user_created                                       String          @db.Uuid
+  date_created                                       DateTime        @db.Timestamptz(6)
   user_updated                                       String?         @db.Uuid
   date_updated                                       DateTime?       @db.Timestamptz(6)
-  user_id                                            String?         @db.Uuid
-  product_id                                         String?         @db.Uuid
+  product_id                                         String          @db.Uuid
   transaction_hash                                   String?         @db.VarChar(255)
-  total_amount                                       Int?
-  products                                           products?       @relation(fields: [product_id], references: [id], onUpdate: NoAction, map: "orders_product_id_foreign")
-  directus_users_orders_user_createdTodirectus_users directus_users? @relation("orders_user_createdTodirectus_users", fields: [user_created], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "orders_user_created_foreign")
-  Users                                              Users?          @relation(fields: [user_id], references: [id], onUpdate: NoAction, map: "orders_user_id_foreign")
+  total_amount                                       Int
+  user_id                                            String          @db.Uuid
+  products                                           products        @relation(fields: [product_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "orders_product_id_foreign")
+  directus_users_orders_user_createdTodirectus_users directus_users  @relation("orders_user_createdTodirectus_users", fields: [user_created], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "orders_user_created_foreign")
+  directus_users_orders_user_idTodirectus_users      directus_users  @relation("orders_user_idTodirectus_users", fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "orders_user_id_foreign")
   directus_users_orders_user_updatedTodirectus_users directus_users? @relation("orders_user_updatedTodirectus_users", fields: [user_updated], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "orders_user_updated_foreign")
+}
+
+model products {
+  id                                                   String          @id @db.Uuid
+  user_created                                         String          @db.Uuid
+  date_created                                         DateTime        @db.Timestamptz(6)
+  user_updated                                         String?         @db.Uuid
+  date_updated                                         DateTime?       @db.Timestamptz(6)
+  token_id                                             String          @db.VarChar(255)
+  name                                                 String          @db.VarChar(255)
+  price                                                Decimal         @db.Decimal(10, 5)
+  image                                                String          @db.Uuid
+  quantity                                             Int
+  type                                                 String          @default("NFT") @db.VarChar(255)
+  creator                                              String          @db.VarChar(255)
+  description                                          String?         @db.VarChar(255)
+  status                                               String          @default("active") @db.VarChar(255)
+  carts                                                carts[]
+  orders                                               orders[]
+  directus_files                                       directus_files  @relation(fields: [image], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "products_image_foreign")
+  directus_users_products_user_createdTodirectus_users directus_users  @relation("products_user_createdTodirectus_users", fields: [user_created], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "products_user_created_foreign")
+  directus_users_products_user_updatedTodirectus_users directus_users? @relation("products_user_updatedTodirectus_users", fields: [user_updated], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "products_user_updated_foreign")
+  transactions                                         transactions[]
+  wishlists                                            wishlists[]
+}
+
+model settings {
+  id                                                   String          @id @db.Uuid
+  user_created                                         String          @db.Uuid
+  date_created                                         DateTime        @db.Timestamptz(6)
+  user_updated                                         String?         @db.Uuid
+  date_updated                                         DateTime?       @db.Timestamptz(6)
+  fee                                                  String          @db.VarChar(255)
+  project_name                                         String          @db.VarChar(255)
+  directus_users_settings_user_createdTodirectus_users directus_users  @relation("settings_user_createdTodirectus_users", fields: [user_created], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "settings_user_created_foreign")
+  directus_users_settings_user_updatedTodirectus_users directus_users? @relation("settings_user_updatedTodirectus_users", fields: [user_updated], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "settings_user_updated_foreign")
+}
+
+model transactions {
+  id                                                       String          @id @db.Uuid
+  user_created                                             String?         @db.Uuid
+  date_created                                             DateTime?       @db.Timestamptz(6)
+  user_updated                                             String?         @db.Uuid
+  date_updated                                             DateTime?       @db.Timestamptz(6)
+  product_id                                               String          @db.Uuid
+  user_id                                                  String          @db.Uuid
+  transaction_hash                                         String          @db.VarChar(255)
+  products                                                 products        @relation(fields: [product_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "transactions_product_id_foreign")
+  directus_users_transactions_user_createdTodirectus_users directus_users? @relation("transactions_user_createdTodirectus_users", fields: [user_created], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "transactions_user_created_foreign")
+  directus_users_transactions_user_idTodirectus_users      directus_users  @relation("transactions_user_idTodirectus_users", fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "transactions_user_id_foreign")
+  directus_users_transactions_user_updatedTodirectus_users directus_users? @relation("transactions_user_updatedTodirectus_users", fields: [user_updated], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "transactions_user_updated_foreign")
+}
+
+model wishlists {
+  id                                                    String          @id @db.Uuid
+  user_created                                          String          @db.Uuid
+  date_created                                          DateTime        @db.Timestamptz(6)
+  user_updated                                          String?         @db.Uuid
+  date_updated                                          DateTime?       @db.Timestamptz(6)
+  user_id                                               String          @db.Uuid
+  product_id                                            String          @db.Uuid
+  products                                              products        @relation(fields: [product_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "wishlists_product_id_foreign")
+  directus_users_wishlists_user_createdTodirectus_users directus_users  @relation("wishlists_user_createdTodirectus_users", fields: [user_created], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "wishlists_user_created_foreign")
+  directus_users_wishlists_user_idTodirectus_users      directus_users  @relation("wishlists_user_idTodirectus_users", fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "wishlists_user_id_foreign")
+  directus_users_wishlists_user_updatedTodirectus_users directus_users? @relation("wishlists_user_updatedTodirectus_users", fields: [user_updated], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "wishlists_user_updated_foreign")
 }
