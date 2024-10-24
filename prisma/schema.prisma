@@ -7,6 +7,21 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model carts {
+  id                                                String          @id @db.Uuid
+  user_created                                      String          @db.Uuid
+  date_created                                      DateTime        @db.Timestamptz(6)
+  user_updated                                      String?         @db.Uuid
+  date_updated                                      DateTime?       @db.Timestamptz(6)
+  user_id                                           String          @db.Uuid
+  product_id                                        String          @db.Uuid
+  amount                                            Int
+  products                                          products        @relation(fields: [product_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "carts_product_id_foreign")
+  directus_users_carts_user_createdTodirectus_users directus_users  @relation("carts_user_createdTodirectus_users", fields: [user_created], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "carts_user_created_foreign")
+  directus_users_carts_user_idTodirectus_users      directus_users  @relation("carts_user_idTodirectus_users", fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "carts_user_id_foreign")
+  directus_users_carts_user_updatedTodirectus_users directus_users? @relation("carts_user_updatedTodirectus_users", fields: [user_updated], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "carts_user_updated_foreign")
+}
+
 model directus_access {
   id                String            @id @db.Uuid
   role              String?           @db.Uuid
@@ -440,7 +455,11 @@ model directus_users {
   directus_versions_directus_versions_user_createdTodirectus_users        directus_versions[]      @relation("directus_versions_user_createdTodirectus_users")
   directus_versions_directus_versions_user_updatedTodirectus_users        directus_versions[]      @relation("directus_versions_user_updatedTodirectus_users")
   orders_orders_user_createdTodirectus_users                              orders[]                 @relation("orders_user_createdTodirectus_users")
+<<<<<<< HEAD
   orders                                                                  orders[]
+=======
+  orders_orders_user_idTodirectus_users                                   orders[]                 @relation("orders_user_idTodirectus_users")
+>>>>>>> f4683489171064d2614fba22aab47db0e3bdb2f3
   orders_orders_user_updatedTodirectus_users                              orders[]                 @relation("orders_user_updatedTodirectus_users")
   products_products_user_createdTodirectus_users                          products[]               @relation("products_user_createdTodirectus_users")
   products_products_user_updatedTodirectus_users                          products[]               @relation("products_user_updatedTodirectus_users")
@@ -486,6 +505,7 @@ model directus_webhooks {
   directus_flows                directus_flows? @relation(fields: [migrated_flow], references: [id], onUpdate: NoAction, map: "directus_webhooks_migrated_flow_foreign")
 }
 
+<<<<<<< HEAD
 model products {
   id                                                   String          @id @db.Uuid
   user_created                                         String          @db.Uuid
@@ -510,6 +530,8 @@ model products {
   wishlists                                            wishlists[]
 }
 
+=======
+>>>>>>> f4683489171064d2614fba22aab47db0e3bdb2f3
 model orders {
   id                                                 String          @id @db.Uuid
   user_created                                       String          @db.Uuid
@@ -522,6 +544,7 @@ model orders {
   user_id                                            String          @db.Uuid
   products                                           products        @relation(fields: [product_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "orders_product_id_foreign")
   directus_users_orders_user_createdTodirectus_users directus_users  @relation("orders_user_createdTodirectus_users", fields: [user_created], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "orders_user_created_foreign")
+<<<<<<< HEAD
   Users                                              directus_users  @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "orders_user_id_foreign")
   directus_users_orders_user_updatedTodirectus_users directus_users? @relation("orders_user_updatedTodirectus_users", fields: [user_updated], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "orders_user_updated_foreign")
 }
@@ -539,6 +562,34 @@ model carts {
   directus_users_carts_user_createdTodirectus_users directus_users  @relation("carts_user_createdTodirectus_users", fields: [user_created], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "carts_user_created_foreign")
   directus_users_carts_user_idTodirectus_users      directus_users  @relation("carts_user_idTodirectus_users", fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "carts_user_id_foreign")
   directus_users_carts_user_updatedTodirectus_users directus_users? @relation("carts_user_updatedTodirectus_users", fields: [user_updated], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "carts_user_updated_foreign")
+=======
+  directus_users_orders_user_idTodirectus_users      directus_users  @relation("orders_user_idTodirectus_users", fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "orders_user_id_foreign")
+  directus_users_orders_user_updatedTodirectus_users directus_users? @relation("orders_user_updatedTodirectus_users", fields: [user_updated], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "orders_user_updated_foreign")
+}
+
+model products {
+  id                                                   String          @id @db.Uuid
+  user_created                                         String          @db.Uuid
+  date_created                                         DateTime        @db.Timestamptz(6)
+  user_updated                                         String?         @db.Uuid
+  date_updated                                         DateTime?       @db.Timestamptz(6)
+  token_id                                             String          @db.VarChar(255)
+  name                                                 String          @db.VarChar(255)
+  price                                                Decimal         @db.Decimal(10, 5)
+  image                                                String          @db.Uuid
+  quantity                                             Int
+  type                                                 String          @default("NFT") @db.VarChar(255)
+  creator                                              String          @db.VarChar(255)
+  description                                          String?         @db.VarChar(255)
+  status                                               String          @default("active") @db.VarChar(255)
+  carts                                                carts[]
+  orders                                               orders[]
+  directus_files                                       directus_files  @relation(fields: [image], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "products_image_foreign")
+  directus_users_products_user_createdTodirectus_users directus_users  @relation("products_user_createdTodirectus_users", fields: [user_created], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "products_user_created_foreign")
+  directus_users_products_user_updatedTodirectus_users directus_users? @relation("products_user_updatedTodirectus_users", fields: [user_updated], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "products_user_updated_foreign")
+  transactions                                         transactions[]
+  wishlists                                            wishlists[]
+>>>>>>> f4683489171064d2614fba22aab47db0e3bdb2f3
 }
 
 model settings {
