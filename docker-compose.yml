@@ -23,5 +23,3 @@
         ADMIN_EMAIL: "admin@example.com"
         ADMIN_PASSWORD: "1234"
         
-        # Đặt PUBLIC_URL nếu cần
-        # PUBLIC_URL: "https://directus.example.com"
