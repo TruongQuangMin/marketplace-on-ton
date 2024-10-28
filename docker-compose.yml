@@ -10,21 +10,16 @@
         SECRET: "3FB57A689E8B63D429AE9228CA63D"
         DB_CLIENT: "pg"
         DB_CONNECTION_STRING: "postgresql://marketplace-on-ton-db_owner:8mqlo0LvzRgY@ep-yellow-math-a5eh8hqm.us-east-2.aws.neon.tech/marketplace-on-ton-db?sslmode=require" # Địa chỉ host từ Neon.tech
-
-
+      
         STORAGE_LOCATIONS: "supabase"
         STORAGE_SUPABASE_DRIVER: "supabase"
-        STORAGE_SUPABASE_SERVICE_ROLE: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBhdmZ2ZWVsbnR0YWRqemZ1Y3hmIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTcyOTY1NDAyMCwiZXhwIjoyMDQ1MjMwMDIwfQ.6djX8L3IQGunbRq_6WrEZtq9BOkW2PMpH67BLFCK0N8"
-        STORAGE_SUPABASE_BUCKET: "img-marketplace-on-ton"
-        STORAGE_SUPABASE_PROJECT_ID: "pavfveelnttadjzfucxf"
+        STORAGE_SUPABASE_SERVICE_ROLE: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdmanF6dW53dXp3ZHBlcXFqcXZhIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTcyOTc2MzA0NSwiZXhwIjoyMDQ1MzM5MDQ1fQ.b2_AMyS3gbX7ClCYe2qPZxeLOk_Ixpl1r6vPyK6Ey2Q"
+        STORAGE_SUPABASE_BUCKET: "marketplace-on-ton"
+        STORAGE_SUPABASE_PROJECT_ID: "gfjqzunwuzwdpeqqjqva"
         
-        # Tắt cache
         CACHE_ENABLED: "false"
         CACHE_AUTO_PURGE: "false"
-        # CACHE_STORE: "redis"
 
         ADMIN_EMAIL: "admin@example.com"
         ADMIN_PASSWORD: "1234"
         
-        # Đặt PUBLIC_URL nếu cần
-        # PUBLIC_URL: "https://directus.example.com"
