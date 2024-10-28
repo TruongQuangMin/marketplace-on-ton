@@ -14,4 +14,8 @@ export class PrismaService extends PrismaClient implements OnModuleInit {
       await app.close(); // Đóng ứng dụng NestJS
     });
   }
+
+  async onModuleDestroy() {
+    await this.$disconnect();
+  }
 }

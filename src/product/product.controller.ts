@@ -1,7 +1,14 @@
-import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  HttpException,
+  HttpStatus,
+  Param,
+  Query,
+} from '@nestjs/common';
 import { ProductService } from './product.service';
 import {
-  CreateProductDto,
+  // CreateProductDto,
   ProductFilterType,
   ProductPaginationResponseType,
 } from './dto/product.dto';
@@ -11,21 +18,30 @@ import { products as ProductModel } from '@prisma/client';
 export class ProductController {
   constructor(private productService: ProductService) {}
 
-  @Post()
-  create(@Body() data: CreateProductDto): Promise<ProductModel> {
-    return this.productService.create(data);
-  }
-
   @Get()
   getAll(
     @Query() params: ProductFilterType,
   ): Promise<ProductPaginationResponseType> {
     console.log('get all product => ', params);
-    return this.productService.getAll(params);
+    try {
+      return this.productService.searchAll(params);
+    } catch (error) {
+      throw new HttpException(
+        error.message || 'Internal server error',
+        error.status || HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
   }
 
   @Get(':id')
   getDetail(@Param('id') id: string): Promise<ProductModel> {
-    return this.productService.getDetail(id);
+    try {
+      return this.productService.getDetail(id);
+    } catch (error) {
+      throw new HttpException(
+        error.message || 'Internal server error',
+        error.status || HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
   }
 }
