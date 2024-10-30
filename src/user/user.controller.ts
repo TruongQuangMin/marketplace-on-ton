@@ -5,10 +5,9 @@ import {
   Body,
   Patch,
   Param,
-  Delete,
-  Put,
   UseInterceptors,
   UploadedFile,
+  UseGuards,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -25,14 +24,10 @@ export class UserController {
   register(@Body() createUserDto: CreateUserDto) {
     return this.userService.register(createUserDto);
   }
-  @Post('login')
-  login(@Body() createUserDto: CreateUserDto) {
-    return this.userService.register(createUserDto);
-  }
 
-  @Get(':id')
-  findOne(@Param('id') id: string): Promise<User> {
-    return this.userService.findOne(id);
+  @Get()
+  findOneEmail(@Body('email') email: string): Promise<User> {
+    return this.userService.findOneEmail(email);
   }
 
   @Patch(':id')
@@ -42,11 +37,6 @@ export class UserController {
     @Body() updateUserDto: UpdateUserDto,
     @UploadedFile() file: Express.Multer.File,
   ) {
-    return this.userService.update(id, updateUserDto,file);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.userService.remove(+id);
+    return this.userService.update(id, updateUserDto, file);
   }
 }

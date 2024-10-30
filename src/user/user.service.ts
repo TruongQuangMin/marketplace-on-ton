@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { PrismaService } from 'src/prisma.service';
+import { PrismaService } from '../prisma.service';
 
 import { v4 as uuidv4 } from 'uuid';
 import * as argon2 from 'argon2';
@@ -38,6 +38,9 @@ export class UserService {
         result,
       };
     } catch (error) {
+      if (error instanceof HttpException) {
+        throw error;
+      }
       throw new HttpException(
         'Internal server error',
         HttpStatus.INTERNAL_SERVER_ERROR,
@@ -45,14 +48,23 @@ export class UserService {
     }
   }
 
-  async findOne(id: string): Promise<any> {
+  async findOneEmail(email: string): Promise<any> {
     try {
+      console.log(`Searching for user with email: ${email}`);
       const user = await this.prismaService.directus_users.findUnique({
-        where: { id },
+        where: { email },
+        include: {
+          directus_files_directus_files_modified_byTodirectus_users: true,
+        },
       });
-      if (!user) throw new NotFoundException('User not found');
-      return { status: HttpStatus.OK, message: 'Result', user };
+
+      if (!user)
+        throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+      return user;
     } catch (error) {
+      if (error instanceof HttpException) {
+        throw error;
+      }
       throw new HttpException(
         'Internal server error',
         HttpStatus.INTERNAL_SERVER_ERROR,
@@ -66,13 +78,28 @@ export class UserService {
     file?: Express.Multer.File,
   ) {
     try {
-      let fileUrl: string | null = null;
       let newFile = null;
-  
+      let file_url = null;
       if (file) {
-        fileUrl = await SupabaseUtil.Upload(file);
+        const old_user = await this.prismaService.directus_users.findUnique({
+          where: { id },
+        });
+
+        if (old_user && old_user.avatar) {
+          const old_file = await this.prismaService.directus_files.findUnique({
+            where: { id: old_user.avatar },
+          });
+
+          if (old_file) {
+            await SupabaseUtil.Delete([old_file.filename_download]);
+            await this.prismaService.directus_files.delete({
+              where: { id: old_user.avatar },
+            });
+          }
+        }
+        file_url = await SupabaseUtil.Upload(file);
         const fileName = file.originalname;
-        
+
         newFile = await this.prismaService.directus_files.create({
           data: {
             id: uuidv4(),
@@ -86,28 +113,27 @@ export class UserService {
           },
         });
       }
-  
+
       const updateData: any = { ...updateUserDto };
       if (newFile) {
+        updateData.url = file_url;
         updateData.avatar = newFile.id;
       }
-  
+
       const user = await this.prismaService.directus_users.update({
         where: { id },
         data: updateData,
       });
-  
-      console.log( newFile);
-      console.log( user);
-      return {statusCode:HttpStatus.OK, message:'Update successful' }
+
+      console.log(newFile);
+      console.log(user);
+      return { statusCode: HttpStatus.OK, message: 'Update successful' };
     } catch (error) {
       console.log(error);
-      throw new HttpException('Internal server error',HttpStatus.INTERNAL_SERVER_ERROR)
+      throw new HttpException(
+        'Internal server error',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
-
-  remove(id: number) {
-    return `This action removes a #${id} user`;
-  }
 }
-
