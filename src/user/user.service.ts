@@ -79,6 +79,7 @@ export class UserService {
   ) {
     try {
       let newFile = null;
+      let file_url = null;
       if (file) {
         const old_user = await this.prismaService.directus_users.findUnique({
           where: { id },
@@ -96,7 +97,7 @@ export class UserService {
             });
           }
         }
-        await SupabaseUtil.Upload(file);
+        file_url = await SupabaseUtil.Upload(file);
         const fileName = file.originalname;
 
         newFile = await this.prismaService.directus_files.create({
@@ -115,6 +116,7 @@ export class UserService {
 
       const updateData: any = { ...updateUserDto };
       if (newFile) {
+        updateData.url = file_url;
         updateData.avatar = newFile.id;
       }
 
