@@ -13,9 +13,10 @@ model carts {
   date_created                                      DateTime        @db.Timestamptz(6)
   user_updated                                      String?         @db.Uuid
   date_updated                                      DateTime?       @db.Timestamptz(6)
-  user_id                                           String          @db.Uuid
   product_id                                        String          @db.Uuid
   amount                                            Int
+  session_id                                        String          @db.Uuid
+  user_id                                           String          @db.Uuid
   products                                          products        @relation(fields: [product_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "carts_product_id_foreign")
   directus_users_carts_user_createdTodirectus_users directus_users  @relation("carts_user_createdTodirectus_users", fields: [user_created], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "carts_user_created_foreign")
   directus_users_carts_user_idTodirectus_users      directus_users  @relation("carts_user_idTodirectus_users", fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "carts_user_id_foreign")
@@ -437,6 +438,7 @@ model directus_users {
   theme_light_overrides                                                   Json?                    @db.Json
   theme_dark_overrides                                                    Json?                    @db.Json
   wallet_address                                                          String?                  @db.VarChar(255)
+  url                                                                     String?                  @db.VarChar(255)
   carts_carts_user_createdTodirectus_users                                carts[]                  @relation("carts_user_createdTodirectus_users")
   carts_carts_user_idTodirectus_users                                     carts[]                  @relation("carts_user_idTodirectus_users")
   carts_carts_user_updatedTodirectus_users                                carts[]                  @relation("carts_user_updatedTodirectus_users")
@@ -533,9 +535,11 @@ model products {
   description                                          String?         @db.VarChar(255)
   status                                               String          @default("active") @db.VarChar(255)
   image                                                String          @db.Uuid
+  test_json                                            Json            @default("{\"name\":\"\",\"descriptions\":\"\",\"attribute\":\"\"}") @db.Json
+  url                                                  String          @default("https://gfjqzunwuzwdpeqqjqva.supabase.co/storage/v1/object/public/marketplace-on-ton/") @db.VarChar(255)
   carts                                                carts[]
   orders                                               orders[]
-  directus_files                                       directus_files  @relation(fields: [image], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "products_image_foreign")
+  directus_files                                       directus_files  @relation(fields: [image], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "products_image_foreign")
   directus_users_products_user_createdTodirectus_users directus_users  @relation("products_user_createdTodirectus_users", fields: [user_created], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "products_user_created_foreign")
   directus_users_products_user_updatedTodirectus_users directus_users? @relation("products_user_updatedTodirectus_users", fields: [user_updated], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "products_user_updated_foreign")
   transactions                                         transactions[]
