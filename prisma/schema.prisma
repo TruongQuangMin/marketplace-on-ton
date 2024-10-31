@@ -533,6 +533,7 @@ model products {
   description                                          String?         @db.VarChar(255)
   status                                               String          @default("active") @db.VarChar(255)
   image                                                String          @db.Uuid
+  test_json                                            Json?           @db.Json
   carts                                                carts[]
   orders                                               orders[]
   directus_files                                       directus_files  @relation(fields: [image], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "products_image_foreign")
