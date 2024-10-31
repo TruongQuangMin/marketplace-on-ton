@@ -1,10 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import {
-  ProductFilterType,
-  ProductPaginationResponseType,
+  NftDataDto,
+  ProductResponseType,
+  SearchingProduct,
 } from './dto/product.dto';
 import { PrismaService } from 'src/prisma.service';
 import { products as Product } from '@prisma/client';
+// import { v4 as uuidv4 } from 'uuid';
 
 
 @Injectable()
@@ -40,70 +42,48 @@ export class ProductService {
   //   });
   // }
 
-  async searchAll(
-    filters: ProductFilterType,
-  ): Promise<ProductPaginationResponseType> {
-    const items_per_page = Number(filters.items_per_page) || 10;
-    const page = Number(filters.page) || 1;
+  async searchAll(filters: SearchingProduct): Promise<ProductResponseType> {
     const search = filters.search || '';
-    // const priceSearch = filters.search || '';
     const sort = filters.sort === 'asc' || filters.sort === 'desc' ? filters.sort : 'asc';
-    const skip = page > 1 ? (page - 1) * items_per_page : 0;
-
     const products = await this.prismaService.products.findMany({
-      take: items_per_page,
-      skip,
       where: {
         OR: [
           {
-            name: {
-              contains: search,
+            test_json: {
+              path: ['name'],       // Chỉ rõ đường dẫn đến thuộc tính 'name' bên trong JSON
+              string_contains: search, // Tìm kiếm chuỗi bên trong trường JSON
             },
           },
           {
             token_id: {
               contains: search,
+              mode: 'insensitive'
             },
           },
           {
             creator: {
               contains: search,
+              mode: 'insensitive' // khong phan biet chu hoa
             },
           },
         ],
+      },
+      include: {
+        directus_files: {
+          select: {
+            filename_download: true
+          },
+        }
       },
       orderBy: {
         price: sort,
       },
     });
-
-    const total = await this.prismaService.products.count({
-      where: {
-        OR: [
-          {
-            name: {
-              contains: search as string,
-            },
-          },
-          {
-            token_id: {
-              contains: search as string,
-            },
-          },
-          {
-            creator: {
-              contains: search as string,
-            },
-          },
-        ],
-      },
-    });
+    // console.log(products.test_json.name)
 
     return {
       data: products,
-      total,
-      currentPage: page,
-      itemsPerPage: items_per_page,
+
     };
   }
 
@@ -129,5 +109,12 @@ export class ProductService {
         },
       },
     });
+  }
+
+  async getNftData(data: NftDataDto) {
+    // Lấy giá trị của "name" trong "test_json"
+    const nameValue = data.test_json.name;
+    console.log(nameValue);  // Output: "AbcXyz"
+    return nameValue;
   }
 }

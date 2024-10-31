@@ -13,17 +13,49 @@ export class UpdateProductDto {
   description?: string;
 }
 
-export interface ProductFilterType {
+export class ProductDto {
+  id: string;
+  token_id?: string;
+  name?: string;
+  status: string;
+  price?: number;
+  image?: string;
+  quantity?: number;
+  type?: string = 'NFT';
+  creator?: string;
+  description?: string;
+}
+
+export interface SearchingProduct {
   search?: string
-  items_per_page?: number
-  page?: number
-  price?: number
   sort?: string
 }
 
-export interface ProductPaginationResponseType {
+export interface ProductResponseType {
   data: products[]
-  total: number
-  currentPage: number
-  itemsPerPage: number
 }
+
+
+// nft-data.dto.ts
+export class TestJsonDto {
+  name: string;
+  descriptions: string;
+  attribute: string;
+}
+
+export class NftDataDto {
+  id: string;
+  user_created: string;
+  date_created: string;
+  token_id: string;
+  name: string;
+  price: string;
+  quantity: string;
+  type: string;
+  creator: string;
+  description: string;
+  status: string;
+  image: string;
+  test_json: TestJsonDto;  // Đây là phần chứa name mà bạn muốn lấy
+}
+
