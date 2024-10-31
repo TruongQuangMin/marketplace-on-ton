@@ -22,7 +22,11 @@ export class CartDto {
   @IsInt()
   amount: number;
 
-  // Thêm thông tin sản phẩm (có thể mở rộng theo nhu cầu)
+
+  @IsNotEmpty()
+  @IsInt()
+  session_id: string;
+
   product_name?: string;
   product_price?: number;
   product_image?: string;
