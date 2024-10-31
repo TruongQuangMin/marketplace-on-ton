@@ -16,6 +16,17 @@ export class UserService {
   constructor(private readonly prismaService: PrismaService) {}
   async register(createUserDto: CreateUserDto) {
     try {
+      const existingUser = await this.prismaService.directus_users.findUnique({
+        where: { email: createUserDto.email },
+      });
+
+      if (existingUser) {
+        return {
+          status: HttpStatus.CONFLICT,
+          message: 'Email already exists. Please use another email.',
+        };
+      }
+
       if (createUserDto.password != createUserDto.confirm_password)
         return {
           status: HttpStatus.OK,
@@ -38,9 +49,7 @@ export class UserService {
         result,
       };
     } catch (error) {
-      if (error instanceof HttpException) {
-        throw error;
-      }
+      console.log(error);
       throw new HttpException(
         'Internal server error',
         HttpStatus.INTERNAL_SERVER_ERROR,
@@ -55,6 +64,7 @@ export class UserService {
         where: { email },
         include: {
           directus_files_directus_files_modified_byTodirectus_users: true,
+          directus_roles: true,
         },
       });
 
@@ -97,16 +107,18 @@ export class UserService {
             });
           }
         }
-        file_url = await SupabaseUtil.Upload(file);
-        const fileName = file.originalname;
+        const newFileId = uuidv4();
+        const fileExtension = file.originalname.split('.').pop();
+        const fileName = `${newFileId}.${fileExtension}`;
 
+        file_url = await SupabaseUtil.Upload(file, newFileId);
         newFile = await this.prismaService.directus_files.create({
           data: {
-            id: uuidv4(),
+            id: newFileId,
             storage: 'supabase',
             filename_disk: fileName,
-            filename_download: fileName,
-            title: fileName,
+            filename_download: file.originalname,
+            title: file.originalname,
             type: file.mimetype,
             filesize: file.size,
             uploaded_on: new Date(),
