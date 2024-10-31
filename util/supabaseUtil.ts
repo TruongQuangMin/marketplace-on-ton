@@ -11,20 +11,19 @@ const supabase: SupabaseClient = createClient(
 );
 
 const SupabaseUtil = {
-  async Upload(file: Express.Multer.File): Promise<string> {
-    const fileName = `${file.originalname}`;
-    const { data, error } = await supabase.storage
-      .from('marketplace-on-ton')  
-      .upload(fileName, file.buffer, {  
+  async Upload(file: Express.Multer.File, fileId: string): Promise<string> {
+    const fileName = `${fileId}.${file.originalname.split('.').pop()}`;
+    const { error } = await supabase.storage
+      .from('marketplace-on-ton')
+      .upload(fileName, file.buffer, {
         cacheControl: '3600',
         contentType: file.mimetype,
         upsert: false,
       });
 
     if (error) throw new Error(`Upload failed: ${error.message}`);
-    return `${SUPABASE_STORAGE_URL}/marketplace-on-ton/${fileName}`;
+    return `${SUPABASE_BASE_URL}/storage/v1/object/public/marketplace-on-ton/${fileName}`;
   },
-
 
   async Delete(storage_path_arr: string[]): Promise<void> {
     const { data, error } = await supabase.storage
