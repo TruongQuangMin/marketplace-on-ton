@@ -71,7 +71,8 @@ export class ProductService {
       include: {
         directus_files: {
           select: {
-            filename_download: true
+            filename_download: true,
+            metadata: true
           },
         }
       },
