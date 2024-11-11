@@ -8,7 +8,7 @@ import { ProductModule } from './product/product.module';
 import { UserModule } from './user/user.module';
 
 @Module({
-  imports: [ProductModule, WishlistModule, UserModule],
+  imports: [ProductModule, WishlistModule, UserModule, CartsModule],
   controllers: [AppController],
   providers: [AppService,PrismaService],
 })
