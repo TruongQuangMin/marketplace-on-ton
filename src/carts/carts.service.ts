@@ -14,13 +14,13 @@ export class CartService {
   constructor(private prisma: PrismaService) {}
   
   async addToCart(
-    sessionId: string | null | undefined,
     userId: string | null, 
+    sessionId: string | null | undefined,
     productId: string, 
     amount: number
   ): Promise<{ message: string; cartItem: CartDto }> {
     // Nếu sessionId không tồn tại, tự động tạo UUID mới
-    const generatedSessionId = sessionId || uuidv4(); 
+    const generatedSessionId = sessionId || uuidv4();
   
     // Kiểm tra sản phẩm có tồn tại không
     const product = await this.prisma.products.findUnique({
@@ -36,54 +36,33 @@ export class CartService {
       throw new BadRequestException('Not enough stock available');
     }
   
-    const searchConditions: any = {
+    const searchConditions = {
       product_id: productId,
+      ...(userId ? { user_id: userId } : { session_id: generatedSessionId }),
     };
-    
-    if (userId) {
-      searchConditions.user_id = userId;
-    } else {
-      searchConditions.session_id = generatedSessionId; 
-    }
-    
-    const existingUser = await this.prisma.carts.findFirst({
-      where: { OR: [{ user_id: searchConditions.user_id }, { session_id: searchConditions.session_id }] },
+  
+    // Kiểm tra xem sản phẩm đã tồn tại trong giỏ hàng chưa cho userId hoặc sessionId
+    const existingCartItem = await this.prisma.carts.findFirst({
+      where: searchConditions,
+      include: { products: true },
     });
   
-    let cartItem;
-  
-    if (existingUser) {
-      const existingProduct = await this.prisma.carts.findFirst({
-        where: { product_id: searchConditions.product_id },
-        include: { products: true },
-      });
-      if (existingProduct) {
-        throw new ConflictException('Product already in cart');
-      }
-      cartItem = await this.prisma.carts.create({
-        data: {
-          id: uuidv4(),
-          user_created: userId ? userId : null, 
-          user_id: userId || null,
-          session_id: userId ? null : generatedSessionId,
-          product_id: productId,
-          amount,
-          date_created: new Date(),
-        },
-      });
-    } else {
-      cartItem = await this.prisma.carts.create({
-        data: {
-          id: uuidv4(),
-          user_created: userId ? userId : null, 
-          user_id: userId || null,
-          session_id: userId ? null : generatedSessionId,
-          product_id: productId,
-          amount,
-          date_created: new Date(),
-        },
-      });
+    if (existingCartItem) {
+      throw new ConflictException('Product already in cart');
     }
+  
+    // Thêm sản phẩm vào giỏ hàng nếu chưa có
+    const cartItem = await this.prisma.carts.create({
+      data: {
+        id: uuidv4(),
+        user_created: userId || null, 
+        user_id: userId || null,
+        session_id: userId ? null : generatedSessionId,
+        product_id: productId,
+        amount,
+        date_created: new Date(),
+      },
+    });
   
     return {
       message: 'Product added to cart successfully',
@@ -102,11 +81,13 @@ export class CartService {
   }
   
   
+  
 
-  async getCartItems(userId: string | null, sessionId: string | null): Promise<CartDto[]> {
+  async getCartItems(userId: string | null, sessionId: string | null): Promise<{ items: CartDto[], totalAmount: number }> {
     if (userId && sessionId) {
       throw new BadRequestException('Please provide either userId or sessionId, not both.');
     }
+    
     const whereCondition = userId
       ? { user_id: userId }
       : { session_id: sessionId };
@@ -117,6 +98,7 @@ export class CartService {
     });
   
     const remainingItems: CartDto[] = [];
+    let totalAmount = 0;
   
     for (const item of cartItems) {
       const product = item.products;
@@ -135,11 +117,14 @@ export class CartService {
           product_price: product.price.toNumber(),
           product_image: product.image,
         });
+  
+        totalAmount += product.price.toNumber() * item.amount; 
       }
     }
   
-    return remainingItems;
+    return { items: remainingItems, totalAmount };
   }
+  
   
 
   async updateCartItemAmount(
