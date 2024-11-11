@@ -4,7 +4,7 @@ import {
   ProductResponseType,
   SearchingProduct,
 } from './dto/product.dto';
-import { PrismaService } from 'src/prisma.service';
+import { PrismaService } from '../prisma.service';
 import { products as Product } from '@prisma/client';
 // import { v4 as uuidv4 } from 'uuid';
 
@@ -42,50 +42,50 @@ export class ProductService {
   //   });
   // }
 
-  async searchAll(filters: SearchingProduct): Promise<ProductResponseType> {
-    const search = filters.search || '';
-    const sort = filters.sort === 'asc' || filters.sort === 'desc' ? filters.sort : 'asc';
-    const products = await this.prismaService.products.findMany({
-      where: {
-        OR: [
-          {
-            test_json: {
-              path: ['name'],       // Chỉ rõ đường dẫn đến thuộc tính 'name' bên trong JSON
-              string_contains: search, // Tìm kiếm chuỗi bên trong trường JSON
-            },
-          },
-          {
-            token_id: {
-              contains: search,
-              mode: 'insensitive'
-            },
-          },
-          {
-            creator: {
-              contains: search,
-              mode: 'insensitive' // khong phan biet chu hoa
-            },
-          },
-        ],
-      },
-      include: {
-        directus_files: {
-          select: {
-            filename_download: true
-          },
-        }
-      },
-      orderBy: {
-        price: sort,
-      },
-    });
-    // console.log(products.test_json.name)
+  // async searchAll(filters: SearchingProduct): Promise<ProductResponseType> {
+  //   const search = filters.search || '';
+  //   const sort = filters.sort === 'asc' || filters.sort === 'desc' ? filters.sort : 'asc';
+  //   const products = await this.prismaService.products.findMany({
+  //     where: {
+  //       OR: [
+  //         {
+  //           test_json: {
+  //             path: ['name'],       // Chỉ rõ đường dẫn đến thuộc tính 'name' bên trong JSON
+  //             string_contains: search, // Tìm kiếm chuỗi bên trong trường JSON
+  //           },
+  //         },
+  //         {
+  //           token_id: {
+  //             contains: search,
+  //             mode: 'insensitive'
+  //           },
+  //         },
+  //         {
+  //           creator: {
+  //             contains: search,
+  //             mode: 'insensitive' // khong phan biet chu hoa
+  //           },
+  //         },
+  //       ],
+  //     },
+  //     include: {
+  //       directus_files: {
+  //         select: {
+  //           filename_download: true
+  //         },
+  //       }
+  //     },
+  //     orderBy: {
+  //       price: sort,
+  //     },
+  //   });
+  //   // console.log(products.test_json.name)
 
-    return {
-      data: products,
+  //   return {
+  //     data: products,
 
-    };
-  }
+  //   };
+  // }
 
   async getDetail(id: string): Promise<Product> {
     return await this.prismaService.products.findFirst({

@@ -17,20 +17,20 @@ import { NftDataDto, ProductResponseType, SearchingProduct } from './dto/product
 export class ProductController {
   constructor(private productService: ProductService) {}
 
-  @Get()
-  getAll(
-    @Query() params: SearchingProduct,
-  ): Promise<ProductResponseType> {
-    console.log('get all product => ', params);
-    try {
-      return this.productService.searchAll(params);
-    } catch (error) {
-      throw new HttpException(
-        error.message || 'Internal server error',
-        error.status || HttpStatus.INTERNAL_SERVER_ERROR,
-      );
-    }
-  }
+  // @Get()
+  // getAll(
+  //   @Query() params: SearchingProduct,
+  // ): Promise<ProductResponseType> {
+  //   console.log('get all product => ', params);
+  //   try {
+  //     return this.productService.searchAll(params);
+  //   } catch (error) {
+  //     throw new HttpException(
+  //       error.message || 'Internal server error',
+  //       error.status || HttpStatus.INTERNAL_SERVER_ERROR,
+  //     );
+  //   }
+  // }
 
   @Get(':id')
   getDetail(@Param('id') id: string): Promise<ProductModel> {
