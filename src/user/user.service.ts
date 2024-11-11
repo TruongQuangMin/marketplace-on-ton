@@ -111,7 +111,7 @@ export class UserService {
         const fileExtension = file.originalname.split('.').pop();
         const fileName = `${newFileId}.${fileExtension}`;
 
-        file_url = await SupabaseUtil.Upload(file, newFileId);
+        file_url = await SupabaseUtil.Upload(file);
         newFile = await this.prismaService.directus_files.create({
           data: {
             id: newFileId,

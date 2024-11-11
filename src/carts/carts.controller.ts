@@ -6,17 +6,19 @@ import { CartDto } from './dto/cart.dto';
 export class CartController {
   constructor(private readonly cartService: CartService) {}
 
-  @Get()
-  async getCartItems(
-    @Query('userId') userId: string | null, 
-    @Query('sessionId') sessionId: string | null, 
-  ): Promise<CartDto[]> {
-    const cartItems = await this.cartService.getCartItems(userId, sessionId);
-    if (!cartItems || cartItems.length === 0) {
-      throw new NotFoundException('Your cart is empty or products are out of stock.');
-    }
-    return cartItems;
+ @Get()
+async getCartItems(
+  @Query('userId') userId: string | null, 
+  @Query('sessionId') sessionId: string | null, 
+): Promise<{ items: CartDto[], totalAmount: number }> {
+  const { items, totalAmount } = await this.cartService.getCartItems(userId, sessionId);
+  
+  if (!items || items.length === 0) {
+    throw new NotFoundException('Your cart is empty or products are out of stock.');
   }
+
+  return { items, totalAmount };
+}
 
   @Patch('productId')
   async updateCartItemAmount(
