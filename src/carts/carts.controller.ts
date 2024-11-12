@@ -1,4 +1,4 @@
-import { Controller, Post, Body, UseGuards, Get, Param, NotFoundException, Patch, ParseUUIDPipe, Delete, Query } from '@nestjs/common';
+import { Controller, Post, Body, UseGuards, Get, Param, NotFoundException, Patch, ParseUUIDPipe, Delete, Query, BadRequestException } from '@nestjs/common';
 import { CartService } from './carts.service';
 import { CartDto } from './dto/cart.dto';
 
