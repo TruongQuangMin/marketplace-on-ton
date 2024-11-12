@@ -19,10 +19,8 @@ export class CartService {
     productId: string, 
     amount: number
   ): Promise<{ message: string; cartItem: CartDto }> {
-    // Nếu sessionId không tồn tại, tự động tạo UUID mới
     const generatedSessionId = sessionId || uuidv4();
   
-    // Kiểm tra sản phẩm có tồn tại không
     const product = await this.prisma.products.findUnique({
       where: { id: productId },
     });
@@ -31,7 +29,6 @@ export class CartService {
       throw new NotFoundException('Product not found');
     }
   
-    // Kiểm tra nếu số lượng sản phẩm có đủ để thêm vào giỏ hàng
     if (product.quantity < amount) {
       throw new BadRequestException('Not enough stock available');
     }
@@ -41,7 +38,6 @@ export class CartService {
       ...(userId ? { user_id: userId } : { session_id: generatedSessionId }),
     };
   
-    // Kiểm tra xem sản phẩm đã tồn tại trong giỏ hàng chưa cho userId hoặc sessionId
     const existingCartItem = await this.prisma.carts.findFirst({
       where: searchConditions,
       include: { products: true },
@@ -51,7 +47,6 @@ export class CartService {
       throw new ConflictException('Product already in cart');
     }
   
-    // Thêm sản phẩm vào giỏ hàng nếu chưa có
     const cartItem = await this.prisma.carts.create({
       data: {
         id: uuidv4(),
