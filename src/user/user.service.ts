@@ -61,7 +61,11 @@ export class UserService {
     try {
       console.log(`Searching for user with email: ${email}`);
       const user = await this.prismaService.directus_users.findUnique({
-        where: { email }
+        where: { email },
+        include: {
+          directus_files_directus_files_modified_byTodirectus_users: true,
+          directus_roles: true,
+        },
       });
 
       if (!user)
@@ -82,7 +86,7 @@ export class UserService {
     id: string,
     updateUserDto: UpdateUserDto,
     file?: Express.Multer.File,
-  ) {    
+  ) {
     try {
       let newFile = null;
       let file_url = null;

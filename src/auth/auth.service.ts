@@ -1,30 +1,39 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  Injectable,
+  InternalServerErrorException,
+  UnauthorizedException,
+} from '@nestjs/common';
+import { UserService } from '../user/user.service';
 import { JwtService } from '@nestjs/jwt';
-import { directus_users } from '@prisma/client';
-import { UserService } from 'src/user/user.service';
 import * as argon2 from 'argon2';
-
 @Injectable()
 export class AuthService {
   constructor(
-    private user_service: UserService,
-    private jwt_service: JwtService,
+    private userService: UserService,
+    private jwtService: JwtService,
   ) {}
-  async Login(email: string, password: string): Promise<any> {
-    const user: any = await this.user_service.findOneEmail(email);
-    const isPasswordValid = await argon2.verify(user.password, password);
-    if (!isPasswordValid) {
-      throw new UnauthorizedException('Invalid password');
-    }
-    const payload = {
-      id: user.id,
-      email: user.email,  
-      role: user.role,
-    };
-    console.log(payload);
 
+  async validateUser(email: string, password: string): Promise<any> {
+    console.log(`Validating user: ${email}`);
+    try {
+      const user = await this.userService.findOneEmail(email);
+      const isPasswordValid = await argon2.verify(user.password, password);
+      if (!isPasswordValid) {
+        throw new UnauthorizedException('Invalid password');
+      }
+      return user; 
+    } catch (error) {
+      console.error('Error during user validation:', error);
+      throw error; 
+    }
+  }
+  
+  
+  async login(user: any) {
+    console.log('Logging in user:', user);
+    const payload = { email: user.email, sub: user.id };
     return {
-      token: this.jwt_service.sign(payload),
+      access_token: this.jwtService.sign(payload),
     };
   }
 }
