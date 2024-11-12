@@ -3,13 +3,10 @@ import { AuthService } from './auth.service';
 
 import { SignInDTO } from './dto/sign-in.dto';
 import { Public } from '../auth/decorator/public.decorator';
-import { CACHE_MANAGER } from '@nestjs/cache-manager';
-import { Cache } from 'cache-manager';
+
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService,
-    @Inject(CACHE_MANAGER) private cacheManager: Cache
-  ) {}
+  constructor(private readonly authService: AuthService) {}
 
   @Public()
   @Post('Login')
@@ -17,7 +14,7 @@ export class AuthController {
     return this.authService.Login(sign_in_dto.email, sign_in_dto.password);
   }
 
-/*   @Public()
+  /*   @Public()
   @Get('delete_cache')
   async handleDirectusPoliciesUpdate(@Body() body: any) {
     console.log('Webhook Triggered:', body);

@@ -6,9 +6,10 @@ import { CartsModule } from './carts/carts.module';
 import { PrismaService } from './prisma.service';
 import { ProductModule } from './product/product.module';
 import { UserModule } from './user/user.module';
-
+import { AuthModule } from './auth/auth.module';
+import { HttpModule } from '@nestjs/axios';
 @Module({
-  imports: [ProductModule, WishlistModule, UserModule, CartsModule],
+  imports: [ProductModule, WishlistModule, UserModule, CartsModule,AuthModule, HttpModule],
   controllers: [AppController],
   providers: [AppService,PrismaService],
 })
