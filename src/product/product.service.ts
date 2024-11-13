@@ -49,12 +49,6 @@ export class ProductService {
       where: {
         OR: [
           {
-            test_json: {
-              path: ['name'],       // Chỉ rõ đường dẫn đến thuộc tính 'name' bên trong JSON
-              string_contains: search, // Tìm kiếm chuỗi bên trong trường JSON
-            },
-          },
-          {
             token_id: {
               contains: search,
               mode: 'insensitive'

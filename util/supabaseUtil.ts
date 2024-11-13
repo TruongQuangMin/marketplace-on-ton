@@ -11,7 +11,7 @@ const supabase: SupabaseClient = createClient(
 );
 
 const SupabaseUtil = {
-  async Upload(file: Express.Multer.File): Promise<string> {
+  async Upload(file: Express.Multer.File, newFileId: string): Promise<string> {
     const fileName = `${file.originalname}`;
     const { data, error } = await supabase.storage
       .from('marketplace-on-ton')  

@@ -30,13 +30,13 @@ export class UserController {
     return this.userService.findOneEmail(email);
   }
 
-  @Patch(':id')
-  @UseInterceptors(FileInterceptor('avatar'))
-  async update(
-    @Param('id') id: string,
-    @Body() updateUserDto: UpdateUserDto,
-    @UploadedFile() file: Express.Multer.File,
-  ) {
-    return this.userService.update(id, updateUserDto, file);
-  }
+  // @Patch(':id')
+  // @UseInterceptors(FileInterceptor('avatar'))
+  // async update(
+  //   @Param('id') id: string,
+  //   @Body() updateUserDto: UpdateUserDto,
+  //   @UploadedFile() file: Express.Multer.File,
+  // ) {
+  //   return this.userService.update(id, updateUserDto, file);
+  // }
 }

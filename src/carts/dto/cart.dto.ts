@@ -22,9 +22,7 @@ export class CartDto {
   @IsInt()
   amount: number;
 
-
-  @IsNotEmpty()
-  @IsInt()
+  @IsString()
   session_id: string;
 
   product_name?: string;
