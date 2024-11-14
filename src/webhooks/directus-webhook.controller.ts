@@ -1,4 +1,4 @@
-import { Body, Controller, Get, HttpException, HttpStatus, Param, Post } from '@nestjs/common';
+import { Body, Controller, HttpException, HttpStatus, Post } from '@nestjs/common';
 // import { ImageTransferService } from './supabase.service';
 // import { ImageTransferService } from './image-transfer.service';
 

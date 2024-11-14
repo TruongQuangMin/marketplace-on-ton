@@ -1,4 +1,4 @@
-import { Controller, Post, Body, UseGuards, Get, Param, NotFoundException, Patch, ParseUUIDPipe, Delete, Query } from '@nestjs/common';
+import { Controller, Post, Body, UseGuards, Get, Param, NotFoundException, Patch, ParseUUIDPipe, Delete, Query, BadRequestException } from '@nestjs/common';
 import { CartService } from './carts.service';
 import { CartDto } from './dto/cart.dto';
 
@@ -6,35 +6,25 @@ import { CartDto } from './dto/cart.dto';
 export class CartController {
   constructor(private readonly cartService: CartService) {}
 
-  @Post('add')
-  async addToCart(
-    @Body('userId') userId: string | null,  // userId có thể null
-    @Body('sessionId') sessionId: string | null, // Thêm sessionId
-    @Body('productId') productId: string,
-    @Body('amount') amount: number,
-  ): Promise<CartDto> {
-    return this.cartService.addToCart(userId, sessionId, productId, amount);
+ @Get()
+async getCartItems(
+  @Query('userId') userId: string | null, 
+  @Query('sessionId') sessionId: string | null, 
+): Promise<{ items: CartDto[], totalAmount: number }> {
+  const { items, totalAmount } = await this.cartService.getCartItems(userId, sessionId);
+  
+  if (!items || items.length === 0) {
+    throw new NotFoundException('Your cart is empty or products are out of stock.');
   }
 
-  @Get()
-  async getCartItems(
-    @Query('userId') userId: string | null, // Có thể là null
-    @Query('sessionId') sessionId: string | null, // Có thể là null
-  ): Promise<CartDto[]> {
-    // Gọi phương thức getCartItems từ CartService để lấy giỏ hàng
-    const cartItems = await this.cartService.getCartItems(userId, sessionId);
-    // Nếu giỏ hàng trống sau khi xóa sản phẩm hết hàng
-    if (!cartItems || cartItems.length === 0) {
-      throw new NotFoundException('Your cart is empty or products are out of stock.');
-    }
-    return cartItems;
-  }
+  return { items, totalAmount };
+}
 
-  @Patch(':productId')
+  @Patch('productId')
   async updateCartItemAmount(
     @Param('productId', new ParseUUIDPipe()) productId: string,
-    @Body('userId') userId: string | null, // Có thể là null
-    @Body('sessionId') sessionId: string | null, // Có thể là null
+    @Body('userId') userId: string | null, 
+    @Body('sessionId') sessionId: string | null, 
     @Body('newAmount') newAmount: number,
   ): Promise<{ message: string; updatedItem: CartDto }> {
     const result = await this.cartService.updateCartItemAmount(userId, sessionId, productId, newAmount);
@@ -44,22 +34,35 @@ export class CartController {
     };
   }
 
-  // Endpoint xóa sản phẩm khỏi giỏ hàng
-  @Delete(':productId')
+
+  @Delete('productId')
   async removeCartItem(
     @Param('productId', new ParseUUIDPipe()) productId: string,
-    @Body('userId') userId: string | null, // Có thể là null
-    @Body('sessionId') sessionId: string | null, // Có thể là null
+    @Body('userId') userId: string | null, 
+    @Body('sessionId') sessionId: string | null, 
   ): Promise<{ message: string }> {
     return this.cartService.removeCartItem(userId, sessionId, productId);
   }
 
-  // Endpoint xóa toàn bộ giỏ hàng
   @Delete('clear')
   async removeAllCartItems(
-    @Body('userId') userId: string | null, // Có thể là null
-    @Body('sessionId') sessionId: string | null, // Có thể là null
+    @Body('userId') userId: string | null, 
+    @Body('sessionId') sessionId: string | null,
   ): Promise<{ message: string }> {
     return this.cartService.clearCart(userId, sessionId);
+  }
+
+  @Post('add')
+  async addToCart(
+    @Body('userId') userId: string | null,
+    @Body('sessionId') sessionId: string | null,
+    @Body('productId') productId: string,
+    @Body('amount') amount: number,
+    ): Promise<{message: string, CartDTO: CartDto}> {
+      const result =  await this.cartService.addToCart(userId, sessionId, productId, amount);
+    return {
+      message: 'Product added to cart successfully',
+      CartDTO: result.cartItem,
+    }
   }
 }

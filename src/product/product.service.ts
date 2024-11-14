@@ -4,7 +4,7 @@ import {
   ProductResponseType,
   SearchingProduct,
 } from './dto/product.dto';
-import { PrismaService } from 'src/prisma.service';
+import { PrismaService } from '../prisma.service';
 import { products as Product } from '@prisma/client';
 // import { v4 as uuidv4 } from 'uuid';
 
@@ -88,20 +88,11 @@ export class ProductService {
         id,
       },
       include: {
-        orders: {
+        directus_files: {
           select: {
-            id: true,
-            transaction_hash: true,
-            total_amount: true,
-            date_created: true,
+            filename_disk: true
           },
-        },
-        wishlists: {
-          select: {
-            id: true,
-            user_created: true,
-          },
-        },
+        }
       },
     });
   }
