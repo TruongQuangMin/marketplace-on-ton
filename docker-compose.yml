@@ -9,7 +9,7 @@
       environment:
         SECRET: "3FB57A689E8B63D429AE9228CA63D"
         DB_CLIENT: "pg"
-        DB_CONNECTION_STRING: "postgresql://marketplace-on-ton-db_owner:8mqlo0LvzRgY@ep-yellow-math-a5eh8hqm.us-east-2.aws.neon.tech/marketplace-on-ton-db?sslmode=require" # Địa chỉ host từ Neon.tech
+        DB_CONNECTION_STRING: "postgresql://neondb_owner:jS25vaokAFRC@ep-restless-cherry-a15cs05h.ap-southeast-1.aws.neon.tech/neon-db?sslmode=require" # Địa chỉ host từ Neon.tech
       
         STORAGE_LOCATIONS: "supabase"
         STORAGE_SUPABASE_DRIVER: "supabase"
@@ -21,5 +21,5 @@
         CACHE_AUTO_PURGE: "false"
 
         ADMIN_EMAIL: "admin@example.com"
-        ADMIN_PASSWORD: "1234"
+        ADMIN_PASSWORD: "123123123"
         

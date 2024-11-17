@@ -42,50 +42,45 @@ export class ProductService {
   //   });
   // }
 
-  // async searchAll(filters: SearchingProduct): Promise<ProductResponseType> {
-  //   const search = filters.search || '';
-  //   const sort = filters.sort === 'asc' || filters.sort === 'desc' ? filters.sort : 'asc';
-  //   const products = await this.prismaService.products.findMany({
-  //     where: {
-  //       OR: [
-  //         {
-  //           test_json: {
-  //             path: ['name'],       // Chỉ rõ đường dẫn đến thuộc tính 'name' bên trong JSON
-  //             string_contains: search, // Tìm kiếm chuỗi bên trong trường JSON
-  //           },
-  //         },
-  //         {
-  //           token_id: {
-  //             contains: search,
-  //             mode: 'insensitive'
-  //           },
-  //         },
-  //         {
-  //           creator: {
-  //             contains: search,
-  //             mode: 'insensitive' // khong phan biet chu hoa
-  //           },
-  //         },
-  //       ],
-  //     },
-  //     include: {
-  //       directus_files: {
-  //         select: {
-  //           filename_download: true
-  //         },
-  //       }
-  //     },
-  //     orderBy: {
-  //       price: sort,
-  //     },
-  //   });
-  //   // console.log(products.test_json.name)
+  async searchAll(filters: SearchingProduct): Promise<ProductResponseType> {
+    const search = filters.search || '';
+    const sort = filters.sort === 'asc' || filters.sort === 'desc' ? filters.sort : 'asc';
+    const products = await this.prismaService.products.findMany({
+      where: {
+        OR: [
+          {
+            token_id: {
+              contains: search,
+              mode: 'insensitive'
+            },
+          },
+          {
+            creator: {
+              contains: search,
+              mode: 'insensitive' // khong phan biet chu hoa
+            },
+          },
+        ],
+      },
+      include: {
+        directus_files: {
+          select: {
+            filename_download: true,
+            metadata: true
+          },
+        }
+      },
+      orderBy: {
+        price: sort,
+      },
+    });
+    // console.log(products.test_json.name)
 
-  //   return {
-  //     data: products,
+    return {
+      data: products,
 
-  //   };
-  // }
+    };
+  }
 
   async getDetail(id: string): Promise<Product> {
     return await this.prismaService.products.findFirst({
@@ -93,20 +88,11 @@ export class ProductService {
         id,
       },
       include: {
-        orders: {
+        directus_files: {
           select: {
-            id: true,
-            transaction_hash: true,
-            total_amount: true,
-            date_created: true,
+            filename_disk: true
           },
-        },
-        wishlists: {
-          select: {
-            id: true,
-            user_created: true,
-          },
-        },
+        }
       },
     });
   }
