@@ -10,10 +10,11 @@ import { UserModule } from './user/user.module';
 import { WebhookController } from './webhooks/directus-webhook.controller';
 import { AuthController } from './auth/auth.controller';
 import { AuthModule } from './auth/auth.module';
+import { OrdersModule } from './orders/orders.module';
 // import { SupabaseService } from './webhooks/supabase.service';
 
 @Module({
-  imports: [ProductModule, WishlistModule, UserModule, CartsModule, HttpModule, AuthModule],
+  imports: [ProductModule, WishlistModule, UserModule, CartsModule, HttpModule, AuthModule,OrdersModule],
   controllers: [AppController, WebhookController, AuthController],
   providers: [AppService,PrismaService],
 })
