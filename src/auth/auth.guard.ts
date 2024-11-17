@@ -85,7 +85,7 @@ export class AuthGuard implements CanActivate {
       where: { role: id },
     });
 
-    const response = await fetch('http://localhost:8055/policies?fields=*.*', {
+    const response = await fetch('https://marketplace-on-ton.onrender.com/policies?fields=*.*', {
       method: 'GET',
       headers: {
         Authorization: `Bearer ${token}`,

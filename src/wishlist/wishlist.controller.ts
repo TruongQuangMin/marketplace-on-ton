@@ -3,14 +3,18 @@ import {
   Body,
   Controller,
   Delete,
+  Get,
   HttpException,
   HttpStatus,
+  Request ,
   Post,
 } from '@nestjs/common';
 import { WishlistService } from './wishlist.service';
+import { Permissions } from 'src/auth/decorator/permissions.decorator';
 import {
   ClearWishlistDto,
   CreateWishlistDto,
+  GetAllWishlistDto,
   RemoveWishlistDto,
 } from './dto/wishlist.dto';
 
@@ -19,9 +23,10 @@ export class WishlistController {
   constructor(private wishlistService: WishlistService) {}
 
   @Post()
-  create(@Body() data: CreateWishlistDto): Promise<WishlistModule> {
+  @Permissions('wishlists', 'create')
+  async create(@Body() data: CreateWishlistDto): Promise<WishlistModule> {
     try {
-      return this.wishlistService.addWishlist(data);
+      return await this.wishlistService.addWishlist(data);
     } catch (error) {
       throw new HttpException(
         error.message || 'Internal server error',
@@ -30,10 +35,18 @@ export class WishlistController {
     }
   }
 
+  @Get('me')
+  @Permissions('wishlists', 'read')
+  async getAllWishlist(@Request() req): Promise<GetAllWishlistDto[]> {
+    const userId = req.user.id; 
+    return await this.wishlistService.getAllWishlist(userId);
+  }
+
   @Delete()
-  remove(@Body() data: RemoveWishlistDto): Promise<WishlistModule> {
+  @Permissions('wishlists', 'delete')
+  async remove(@Body() data: RemoveWishlistDto): Promise<WishlistModule> {
     try {
-      return this.wishlistService.removeFromWishlist(data);
+      return await this.wishlistService.removeFromWishlist(data);
     } catch (error) {
       throw new HttpException(
         error.message || 'Internal server error',
@@ -43,9 +56,9 @@ export class WishlistController {
   }
 
   @Delete('clear/me')
-  clear(@Body() data: ClearWishlistDto): Promise<WishlistModule> {
+  async clear(@Body() data: ClearWishlistDto): Promise<WishlistModule> {
     try {
-      return this.wishlistService.clearWishlist(data);
+      return await this.wishlistService.clearWishlist(data);
     } catch (error) {
       throw new HttpException(
         error.message || 'Internal server error',

@@ -8,11 +8,13 @@ import { ProductModule } from './product/product.module';
 import { HttpModule } from '@nestjs/axios';
 import { UserModule } from './user/user.module';
 import { WebhookController } from './webhooks/directus-webhook.controller';
+import { AuthController } from './auth/auth.controller';
+import { AuthModule } from './auth/auth.module';
 // import { SupabaseService } from './webhooks/supabase.service';
 
 @Module({
-  imports: [ProductModule, WishlistModule, UserModule, CartsModule, HttpModule],
-  controllers: [AppController, WebhookController],
+  imports: [ProductModule, WishlistModule, UserModule, CartsModule, HttpModule, AuthModule],
+  controllers: [AppController, WebhookController, AuthController],
   providers: [AppService,PrismaService],
 })
 export class AppModule {}

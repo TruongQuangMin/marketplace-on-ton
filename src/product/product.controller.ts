@@ -1,5 +1,4 @@
 import {
-  Body,
   Controller,
   Get,
   HttpException,
@@ -8,8 +7,8 @@ import {
   Query,
 } from '@nestjs/common';
 import { ProductService } from './product.service';
-import { products as ProductModel } from '@prisma/client';
-import { NftDataDto, ProductResponseType, SearchingProduct } from './dto/product.dto';
+// import { products as ProductModel } from '@prisma/client';
+import { GetDetailProduct, ProductResponseType, SearchingProduct } from './dto/product.dto';
 // import { v4 as uuidv4 } from 'uuid';
 
 
@@ -33,7 +32,7 @@ export class ProductController {
   }
 
   @Get(':id')
-  getDetail(@Param('id') id: string): Promise<ProductModel> {
+  getDetail(@Param('id') id: string): Promise<GetDetailProduct> {
     try {
       return this.productService.getDetail(id);
     } catch (error) {
@@ -42,10 +41,5 @@ export class ProductController {
         error.status || HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
-  }
-
-  @Get('name')
-  getNftName(@Body() data: NftDataDto) {
-    return this.productService.getNftData(data);
   }
 }

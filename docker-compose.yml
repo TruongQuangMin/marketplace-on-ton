@@ -16,6 +16,16 @@
         STORAGE_SUPABASE_SERVICE_ROLE: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdmanF6dW53dXp3ZHBlcXFqcXZhIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTcyOTc2MzA0NSwiZXhwIjoyMDQ1MzM5MDQ1fQ.b2_AMyS3gbX7ClCYe2qPZxeLOk_Ixpl1r6vPyK6Ey2Q"
         STORAGE_SUPABASE_BUCKET: "marketplace-on-ton"
         STORAGE_SUPABASE_PROJECT_ID: "gfjqzunwuzwdpeqqjqva"
+
+        # Send email
+        EMAIL_FROM: "no-reply@example.com"
+        EMAIL_TRANSPORT: "SMTP"
+        EMAIL_SMTP_HOST: "sandbox.smtp.mailtrap.io"
+        EMAIL_SMTP_PORT: "2525"
+        EMAIL_SMTP_USER: "e7695ae20de35d"
+        EMAIL_SMTP_PASSWORD: "95661712235dbd"
+        EMAIL_SMTP_IGNORE_TLS: "true"
+        # EMAIL_SMTP_NAME: ""
         
         CACHE_ENABLED: "false"
         CACHE_AUTO_PURGE: "false"

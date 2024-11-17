@@ -1,13 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import {
-  NftDataDto,
+  GetDetailProduct,
   ProductResponseType,
   SearchingProduct,
 } from './dto/product.dto';
 import { PrismaService } from '../prisma.service';
-import { products as Product } from '@prisma/client';
-// import { v4 as uuidv4 } from 'uuid';
-
+// import { products as Product } from '@prisma/client';
+import SupabaseUtil from 'util/supabaseUtil';
+import { Decimal } from '@prisma/client/runtime/library';
 
 @Injectable()
 export class ProductService {
@@ -44,20 +44,21 @@ export class ProductService {
 
   async searchAll(filters: SearchingProduct): Promise<ProductResponseType> {
     const search = filters.search || '';
-    const sort = filters.sort === 'asc' || filters.sort === 'desc' ? filters.sort : 'asc';
+    const sort =
+      filters.sort === 'asc' || filters.sort === 'desc' ? filters.sort : 'asc';
     const products = await this.prismaService.products.findMany({
       where: {
         OR: [
           {
             token_id: {
               contains: search,
-              mode: 'insensitive'
+              mode: 'insensitive',
             },
           },
           {
             creator: {
               contains: search,
-              mode: 'insensitive' // khong phan biet chu hoa
+              mode: 'insensitive', // khong phan biet chu hoa
             },
           },
         ],
@@ -65,42 +66,54 @@ export class ProductService {
       include: {
         directus_files: {
           select: {
-            filename_download: true,
-            metadata: true
+            filename_disk: true,
           },
-        }
+        },
       },
       orderBy: {
         price: sort,
       },
     });
-    // console.log(products.test_json.name)
 
     return {
       data: products,
-
     };
   }
 
-  async getDetail(id: string): Promise<Product> {
-    return await this.prismaService.products.findFirst({
-      where: {
-        id,
-      },
-      include: {
+  async getDetail(id: string): Promise<GetDetailProduct> {
+    const dataPro = await this.prismaService.products.findFirst({
+      where: { id },
+      select: {
+        id: true,
+        name: true,
+        price: true,
+        quantity: true,
+        token_id: true,
         directus_files: {
           select: {
-            filename_disk: true
+            filename_disk: true,
           },
-        }
+        },
       },
     });
-  }
-
-  async getNftData(data: NftDataDto) {
-    // Lấy giá trị của "name" trong "test_json"
-    const nameValue = data.test_json.name;
-    console.log(nameValue);  // Output: "AbcXyz"
-    return nameValue;
+  
+    if (!dataPro) {
+      throw new Error("Product not found");
+    }
+  
+    const url = dataPro.directus_files?.filename_disk || '';
+    const urlPublic = url ? await SupabaseUtil.GetPublicImageUrl(url) : '';
+  
+    // Chuyển đổi `Decimal` thành `number` cho `price` nếu cần
+    const productDetail: GetDetailProduct = {
+      id: dataPro.id,
+      name: dataPro.name,
+      price: (dataPro.price as Decimal).toNumber(),
+      quantity: dataPro.quantity,
+      token_id: dataPro.token_id,
+      imageUrl: urlPublic, // Gán URL công khai của ảnh
+    };
+  
+    return productDetail;
   }
 }

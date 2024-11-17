@@ -36,26 +36,12 @@ export interface ProductResponseType {
 }
 
 
-// nft-data.dto.ts
-export class TestJsonDto {
-  name: string;
-  descriptions: string;
-  attribute: string;
-}
-
-export class NftDataDto {
+export interface GetDetailProduct {
   id: string;
-  user_created: string;
-  date_created: string;
-  token_id: string;
   name: string;
-  price: string;
-  quantity: string;
-  type: string;
-  creator: string;
-  description: string;
-  status: string;
-  image: string;
-  test_json: TestJsonDto;  // Đây là phần chứa name mà bạn muốn lấy
+  price: number;
+  quantity: number;
+  token_id: string;
+  imageUrl?: string;
 }
 

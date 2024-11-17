@@ -1,7 +1,7 @@
 import 'dotenv/config';
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
-import { v4 as uuidv4 } from 'uuid';
-const SUPABASE_STORAGE_URL = process.env.SUPABASE_STORAGE_URL!;
+// import { v4 as uuidv4 } from 'uuid';
+// const SUPABASE_STORAGE_URL = process.env.SUPABASE_STORAGE_URL!;
 const SUPABASE_BASE_URL = process.env.SUPABASE_BASE_URL!;
 const SUPABASE_NON_PUBLIC_KEY = process.env.SUPABASE_NON_PUBLIC_KEY!;
 
@@ -36,6 +36,17 @@ const SupabaseUtil = {
       console.log('Delete Success:', data);
     }
   },
+
+  async GetPublicImageUrl(url: string): Promise<string | null> {
+    // url: Generated image name or path to image file in local
+    const { data } = supabase.storage.from('marketplace-on-ton').getPublicUrl(url);
+  
+    if (data) {
+      return data.publicUrl;
+    }
+  
+    return null;
+  }
 };
 
 export default SupabaseUtil;
