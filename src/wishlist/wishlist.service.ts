@@ -17,7 +17,7 @@ export class WishlistService {
 
   async addWishlist(data: CreateWishlistDto): Promise<wishlists> {
     const products = await this.prismaService.wishlists.findFirst({
-      where: { user_created: data.user_created, product_id: data.product_id },
+      where: { user_id: data.user_id, product_id: data.product_id },
     });
 
     if (products) {
@@ -30,8 +30,8 @@ export class WishlistService {
     return await this.prismaService.wishlists.create({
       data: {
         id: uuidv4(), // hoặc để tự động tạo UUID
-        user_created: data.user_created,
-        user_id: data.user_created,
+        user_created: data.user_id,
+        user_id: data.user_id,
         product_id: data.product_id,
         date_created: new Date(), // tự động set ngày tạo
       },

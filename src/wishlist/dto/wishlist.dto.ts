@@ -2,9 +2,7 @@ import { IsNotEmpty, IsUUID } from 'class-validator';
 import { GetDetailProduct } from 'src/product/dto/product.dto';
 
 export class CreateWishlistDto {
-  @IsNotEmpty()
-  @IsUUID()
-  user_created: string;
+
 
   @IsNotEmpty()
   @IsUUID()
