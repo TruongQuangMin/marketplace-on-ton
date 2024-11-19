@@ -8,18 +8,20 @@ import {
 } from '@nestjs/common';
 import { ProductService } from './product.service';
 // import { products as ProductModel } from '@prisma/client';
-import { GetDetailProduct, ProductResponseType, SearchingProduct } from './dto/product.dto';
+import {
+  GetDetailProduct,
+  ProductResponseType,
+  SearchingProduct,
+} from './dto/product.dto';
 // import { v4 as uuidv4 } from 'uuid';
-
+import { Public } from '../auth/decorator/public.decorator';
 
 @Controller('products')
 export class ProductController {
   constructor(private productService: ProductService) {}
-
+  @Public()
   @Get()
-  getAll(
-    @Query() params: SearchingProduct,
-  ): Promise<ProductResponseType> {
+  getAll(@Query() params: SearchingProduct): Promise<ProductResponseType> {
     console.log('get all product => ', params);
     try {
       return this.productService.searchAll(params);
