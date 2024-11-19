@@ -38,6 +38,7 @@ export class CartController {
 
     return { items, totalAmount };
   }
+  
   @Public()
   @Patch('productId')
   async updateCartItemAmount(
@@ -82,7 +83,7 @@ export class CartController {
     @Body('sessionId') sessionId: string | null,
     @Body('productId') productId: string,
     @Body('amount') amount: number,
-  ): Promise<{ message: string; CartDTO: CartDto }> {
+  ): Promise<{ message: string; CartInformation: CartDto }> {
     const result = await this.cartService.addToCart(
       userId,
       sessionId,
@@ -91,19 +92,19 @@ export class CartController {
     );
     return {
       message: 'Product added to cart successfully',
-      CartDTO: result.cartItem,
+      CartInformation: result.cartItem,
     };
   }
 
-  // @Post('merge')
-  // async mergeCart(
-  //   @Body('sessionId') sessionId: string | null,
-  //   @Body('userId') userId: string,
-  // ): Promise<{ message: string }> {
-  //   if (!sessionId || !userId) {
-  //     throw new BadRequestException('sessionId and userId are required');
-  //   }
+  @Post('merge')
+  async mergeCart(
+    @Body('sessionId') sessionId: string | null,
+    @Body('userId') userId: string,
+  ): Promise<{ message: string }> {
+    if (!sessionId || !userId) {
+      throw new BadRequestException('sessionId and userId are required');
+    }
 
-  //   return this.cartService.mergeCart(sessionId, userId);
-  // }
+    return this.cartService.mergeCart(sessionId, userId);
+  }
 }

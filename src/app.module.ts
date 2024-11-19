@@ -7,7 +7,6 @@ import { PrismaService } from './prisma.service';
 import { ProductModule } from './product/product.module';
 import { HttpModule } from '@nestjs/axios';
 import { UserModule } from './user/user.module';
-import { WebhookController } from './webhooks/directus-webhook.controller';
 import { AuthController } from './auth/auth.controller';
 import { AuthModule } from './auth/auth.module';
 import { OrdersModule } from './orders/orders.module';
@@ -15,7 +14,7 @@ import { OrdersModule } from './orders/orders.module';
 
 @Module({
   imports: [ProductModule, WishlistModule, UserModule, CartsModule, HttpModule, AuthModule,OrdersModule],
-  controllers: [AppController, WebhookController, AuthController],
+  controllers: [AppController, AuthController],
   providers: [AppService,PrismaService],
 })
 export class AppModule {}
