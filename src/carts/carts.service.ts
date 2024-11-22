@@ -24,7 +24,15 @@ export class CartService {
   
     const product = await this.prisma.products.findUnique({
       where: { id: productId },
+      
     });
+
+    const productImage = product.image
+    ? await this.prisma.directus_files.findUnique({
+        where: { id: product.image },
+        select: { filename_disk: true },
+      })
+    : null;
   
     if (!product) {
       throw new NotFoundException('Product not found');
@@ -71,14 +79,12 @@ export class CartService {
         amount: cartItem.amount,
         product_name: product.name,
         product_price: product.price.toNumber(),
-        product_image: product.image,
+        product_image: productImage?.filename_disk || null,
       },
     };
   }
   
   
-  
-
   async getCartItems(userId: string | null, sessionId: string | null): Promise<{ items: CartDto[], totalAmount: number }> {
     if (userId && sessionId) {
       throw new BadRequestException('Please provide either userId or sessionId, not both.');
@@ -102,6 +108,12 @@ export class CartService {
       if (product.quantity <= 0) {
         await this.prisma.carts.delete({ where: { id: item.id } });
       } else {
+        const productImage = product.image
+        ? await this.prisma.directus_files.findUnique({
+            where: { id: product.image },
+            select: { filename_disk: true },
+          })
+        : null;
         remainingItems.push({
           id: item.id,
           user_created: item.user_created,
@@ -111,7 +123,7 @@ export class CartService {
           amount: item.amount,
           product_name: product.name,
           product_price: product.price.toNumber(),
-          product_image: product.image,
+          product_image: productImage?.filename_disk || null,
         });
   
         totalAmount += product.price.toNumber() * item.amount; 
