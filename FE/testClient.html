@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>WebSocket Test</title>
+    <style>
+      #notification {
+        font-size: 20px;
+        margin-top: 20px;
+        padding: 10px;
+        border: 1px solid #ccc;
+        background-color: #f9f9f9;
+        width: 80%;
+        margin-left: auto;
+        margin-right: auto;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>WebSocket Test</h1>
+    <div id="notification">Waiting for notifications...</div>
+
+    <script src="https://cdn.socket.io/4.0.1/socket.io.min.js"></script>
+    <script>
+      // Kết nối đến WebSocket server
+      const socket = io('http://localhost:3000', {
+        query: { userId: 'b982b73a-218a-4d5a-8d93-0ade132669e1' }, // Gửi userId tới server để định danh (có thể sửa ID)
+      });
+
+      // Lắng nghe sự kiện 'connect' để xác nhận kết nối
+      socket.on('connect', () => {
+        console.log('✅ Connected to WebSocket server with ID:', socket.id);
+      });
+
+      // Lắng nghe sự kiện 'wishlist_notification' từ server
+      socket.on('wishlist_notification', (data) => {
+        // Thay thế nội dung thông báo khi nhận được
+        const notificationElement = document.getElementById('notification');
+        notificationElement.textContent = `New notification: ${data.message}`;
+      });
+
+      // Lắng nghe sự kiện 'disconnect' để xử lý khi kết nối bị mất
+      socket.on('disconnect', () => {
+        console.log('❌ Disconnected from WebSocket server');
+      });
+    </script>
+  </body>
+</html>

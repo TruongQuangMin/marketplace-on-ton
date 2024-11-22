@@ -35,7 +35,7 @@ export class WishlistController {
     }
   }
 
-  @Get('me')
+  @Get()
   @Permissions('wishlists', 'read')
   async getAllWishlist(@Request() req): Promise<GetAllWishlistDto[]> {
     const userId = req.user.id; 
@@ -55,7 +55,7 @@ export class WishlistController {
     }
   }
 
-  @Delete('clear/me')
+  @Delete('clear')
   async clear(@Body() data: ClearWishlistDto): Promise<WishlistModule> {
     try {
       return await this.wishlistService.clearWishlist(data);

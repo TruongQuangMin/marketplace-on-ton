@@ -517,6 +517,7 @@ model orders {
   transaction_hash                                   String?           @db.VarChar(255)
   total_amount                                       Int
   user_id                                            String            @db.Uuid
+  status                                             String            @default("Pending") @db.VarChar(255)
   directus_users_orders_user_createdTodirectus_users directus_users    @relation("orders_user_createdTodirectus_users", fields: [user_created], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "orders_user_created_foreign")
   directus_users_orders_user_idTodirectus_users      directus_users    @relation("orders_user_idTodirectus_users", fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "orders_user_id_foreign")
   directus_users_orders_user_updatedTodirectus_users directus_users?   @relation("orders_user_updatedTodirectus_users", fields: [user_updated], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "orders_user_updated_foreign")

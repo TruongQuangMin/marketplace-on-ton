@@ -7,11 +7,12 @@ import {
 import { PrismaService } from 'src/prisma.service';
 import { CartDto } from './dto/cart.dto';
 import { v4 as uuidv4 } from 'uuid';
+import { ProductService } from 'src/product/product.service';
 
 
 @Injectable()
 export class CartService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService, private proSer: ProductService) {}
   
   async addToCart(
     userId: string | null, 
