@@ -14,11 +14,12 @@ import {
   SearchingProduct,
 } from './dto/product.dto';
 // import { v4 as uuidv4 } from 'uuid';
-// import { Public } from '../auth/decorator/public.decorator';
+import { Public } from '../auth/decorator/public.decorator';
 
 @Controller('products')
 export class ProductController {
   constructor(private productService: ProductService) {}
+  @Public()
   @Get()
   getAll(@Query() params: SearchingProduct): Promise<ProductResponseType> {
     console.log('get all product => ', params);
@@ -32,6 +33,7 @@ export class ProductController {
     }
   }
 
+  @Public()
   @Get(':id')
   getDetail(@Param('id') id: string): Promise<GetDetailProduct> {
     try {
