@@ -18,7 +18,7 @@ import {
   RemoveWishlistDto,
 } from './dto/wishlist.dto';
 
-@Controller('wishlist')
+@Controller('wishlists')
 export class WishlistController {
   constructor(private wishlistService: WishlistService) {}
 
