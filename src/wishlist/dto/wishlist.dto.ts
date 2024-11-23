@@ -16,7 +16,7 @@ export class CreateWishlistDto {
 export class RemoveWishlistDto {
   @IsNotEmpty()
   @IsUUID()
-  user_created: string;
+  user_id: string;
 
   @IsNotEmpty()
   @IsUUID()

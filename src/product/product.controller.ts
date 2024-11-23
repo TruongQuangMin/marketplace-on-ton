@@ -33,6 +33,7 @@ export class ProductController {
     }
   }
 
+  @Public()
   @Get(':id')
   getDetail(@Param('id') id: string): Promise<GetDetailProduct> {
     try {

@@ -9,25 +9,26 @@ import {
 import { wishlists } from '@prisma/client';
 import { v4 as uuidv4 } from 'uuid';
 import SupabaseUtil from 'util/supabaseUtil';
+import { WishlistGateway } from './wishlist.gateway';
 // import { async } from 'rxjs';
 
 @Injectable()
 export class WishlistService {
-  constructor(private prismaService: PrismaService) {}
-
+  constructor(private prismaService: PrismaService, private readonly wishlistGateway: WishlistGateway) {}
+  
   async addWishlist(data: CreateWishlistDto): Promise<wishlists> {
-    const products = await this.prismaService.wishlists.findFirst({
+    const findWishlist = await this.prismaService.wishlists.findFirst({
       where: { user_id: data.user_id, product_id: data.product_id },
     });
 
-    if (products) {
+    if (findWishlist) {
       throw new HttpException(
         { message: 'Product already exists in wishlist' },
         HttpStatus.OK,
       );
     }
 
-    return await this.prismaService.wishlists.create({
+    const wishlist = await this.prismaService.wishlists.create({
       data: {
         id: uuidv4(), // hoặc để tự động tạo UUID
         user_created: data.user_id,
@@ -35,7 +36,11 @@ export class WishlistService {
         product_id: data.product_id,
         date_created: new Date(), // tự động set ngày tạo
       },
-    });
+    })
+
+    this.notifyWishlistChange(data.user_id, 'add');
+
+    return wishlist;
   }
 
   async getAllWishlist(userId: string): Promise<GetAllWishlistDto[]> {
@@ -60,7 +65,7 @@ export class WishlistService {
     });
 
     if (!wishlists) {
-      throw new Error("Product not found");
+      throw new Error("The wishlist is empty");
     }
   
     // const url = wishlists.products.directus_files?.filename_disk || '';
@@ -90,7 +95,7 @@ export class WishlistService {
   ): Promise<{ message: string }> {
     const deleted = await this.prismaService.wishlists.deleteMany({
       where: {
-        user_id: data.user_created,
+        user_created: data.user_id,
         product_id: data.product_id,
       },
     });
@@ -101,6 +106,8 @@ export class WishlistService {
         HttpStatus.NOT_FOUND,
       );
     }
+
+    await this.notifyWishlistChange(data.user_id, 'remove');
 
     return { message: 'Product removed from wishlist successfully' };
   }
@@ -113,6 +120,20 @@ export class WishlistService {
       },
     });
 
+    this.notifyWishlistChange(data.user_created, 'remove');
+
     return { message: 'Wishlist cleared successfully' };
   }
+
+  // Hàm gửi thông báo thông qua websocket
+  async notifyWishlistChange(userId: string, action: 'add' | 'remove') {
+    const messageNotify = `Product has been ${action === 'add' ? 'added to' : 'removed from'} your Wishlist.`;
+    const typeNotify = `wisshlist_${action === 'add' ? 'add' : 'remove'}`;
+  
+    this.wishlistGateway.notifyUser(userId, {
+      type: typeNotify,
+      message: messageNotify,
+    });
+  }
+  
 }
