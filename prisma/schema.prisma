@@ -15,7 +15,6 @@ model carts {
   date_updated                                      DateTime?       @db.Timestamptz(6)
   product_id                                        String          @db.Uuid
   amount                                            Int
-  session_id                                        String?         @db.Uuid
   user_id                                           String?         @db.Uuid
   products                                          products        @relation(fields: [product_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "carts_product_id_foreign")
   directus_users_carts_user_createdTodirectus_users directus_users? @relation("carts_user_createdTodirectus_users", fields: [user_created], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "carts_user_created_foreign")
@@ -539,6 +538,7 @@ model products {
   description                                          String?           @db.VarChar(255)
   status                                               String            @default("active") @db.VarChar(255)
   image                                                String            @db.Uuid
+  wallet_address                                       String            @default("0QA7w1zgD_6Fd1WpEbY9OOeMEP52Up0BP0ErDF3UhFSc7-XX") @db.VarChar(255)
   carts                                                carts[]
   orders_products                                      orders_products[]
   directus_files                                       directus_files    @relation(fields: [image], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "products_image_foreign")

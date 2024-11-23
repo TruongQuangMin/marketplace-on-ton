@@ -1,9 +1,9 @@
 // src/cart/dto/cart.dto.ts
-import { IsNotEmpty, IsString, IsInt } from 'class-validator';
+import { IsNotEmpty, IsString, IsInt,IsUUID } from 'class-validator';
 
 export class CartDto {
+  @IsUUID()
   @IsNotEmpty()
-  @IsString()
   id: string;
 
   @IsNotEmpty()
@@ -14,15 +14,12 @@ export class CartDto {
   user_id: string;
 
   @IsNotEmpty()
-  @IsString()
+  @IsUUID()
   product_id: string;
 
   @IsNotEmpty()
   @IsInt()
   amount: number;
-
-  @IsString()
-  session_id: string;
 
   product_name?: string;
   product_price?: number;
