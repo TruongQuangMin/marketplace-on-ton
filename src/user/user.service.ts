@@ -40,7 +40,7 @@ export class UserService {
           id: uuidv4(),
           email: createUserDto.email,
           password: hashedPassword,
-          role: '891efc27-6afa-4998-b93e-4cfa432fa915', //user role
+          role: 'a3967361-02fb-410f-88f4-aabaa53f4f73', //user role
         },
       });
       return {

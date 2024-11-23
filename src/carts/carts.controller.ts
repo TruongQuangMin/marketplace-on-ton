@@ -10,24 +10,43 @@ import {
   Delete,
   Query,
   BadRequestException,
+  Req,
 } from '@nestjs/common';
 import { CartService } from './carts.service';
 import { CartDto } from './dto/cart.dto';
 import { Public } from '../auth/decorator/public.decorator';
+import { JwtService } from '@nestjs/jwt';
 
 @Controller('cart')
 export class CartController {
-  constructor(private readonly cartService: CartService) {}
+  constructor(
+    private readonly cartService: CartService,
+    private readonly jwtService: JwtService,
+  ) {}
 
   @Public()
   @Get()
   async getCartItems(
-    @Query('userId') userId: string | null,
-    @Query('sessionId') sessionId: string | null,
+    @Req() req: any,
+    @Body('cartId') cartId: string | null,
   ): Promise<{ items: CartDto[]; totalAmount: number }> {
+    let userId: string | null = null;
+    const authHeader = req.headers.authorization;
+    if (authHeader) {
+      const token = authHeader.split(' ')[1];
+      try {
+        const decodedToken = this.jwtService.verify(token, {
+          secret: process.env.JWT_SECRET,
+        });
+        userId = decodedToken.id;
+      } catch (error) {
+        console.error('JWT verification failed:', error.message);
+      }
+    }
+
     const { items, totalAmount } = await this.cartService.getCartItems(
       userId,
-      sessionId,
+      cartId,
     );
 
     if (!items || items.length === 0) {
@@ -35,21 +54,34 @@ export class CartController {
         'Your cart is empty or products are out of stock.',
       );
     }
-
     return { items, totalAmount };
   }
-  
+
   @Public()
   @Patch('productId')
   async updateCartItemAmount(
-    @Param('productId', new ParseUUIDPipe()) productId: string,
-    @Body('userId') userId: string | null,
-    @Body('sessionId') sessionId: string | null,
+    @Req() req: any,
+    @Body('cartId') cartId: string | null,
+    @Body('productId') productId: string,
     @Body('newAmount') newAmount: number,
   ): Promise<{ message: string; updatedItem: CartDto }> {
+
+    let userId: string | null = null;
+    const authHeader = req.headers.authorization;
+    if (authHeader) {
+      const token = authHeader.split(' ')[1];
+      try {
+        const decodedToken = this.jwtService.verify(token, {
+          secret: process.env.JWT_SECRET,
+        });
+        userId = decodedToken.id;
+      } catch (error) {
+        console.error('JWT verification failed:', error.message);
+      }
+    }
     const result = await this.cartService.updateCartItemAmount(
       userId,
-      sessionId,
+      cartId,
       productId,
       newAmount,
     );
@@ -62,49 +94,81 @@ export class CartController {
   @Public()
   @Delete('productId')
   async removeCartItem(
-    @Param('productId', new ParseUUIDPipe()) productId: string,
-    @Body('userId') userId: string | null,
-    @Body('sessionId') sessionId: string | null,
+    @Req() req: any,
+    @Body('cartId') cartId: string | null,
+    @Body('productId') productId: string,
   ): Promise<{ message: string }> {
-    return this.cartService.removeCartItem(userId, sessionId, productId);
+    let userId: string | null = null;
+    const authHeader = req.headers.authorization;
+    if (authHeader) {
+      const token = authHeader.split(' ')[1];
+      try {
+        const decodedToken = this.jwtService.verify(token, {
+          secret: process.env.JWT_SECRET,
+        });
+        userId = decodedToken.id;
+      } catch (error) {
+        console.error('JWT verification failed:', error.message);
+      }
+    }
+    return this.cartService.removeCartItem(userId, cartId, productId);
   }
-
+  
+  @Public()
   @Delete('clear')
   async removeAllCartItems(
-    @Body('userId') userId: string | null,
-    @Body('sessionId') sessionId: string | null,
+    @Req() req: any,
+    @Body('cartId') cartId: string | null,
   ): Promise<{ message: string }> {
-    return this.cartService.clearCart(userId, sessionId);
+    let userId: string | null = null;
+    const authHeader = req.headers.authorization;
+    if (authHeader) {
+      const token = authHeader.split(' ')[1];
+      try {
+        const decodedToken = this.jwtService.verify(token, {
+          secret: process.env.JWT_SECRET,
+        });
+        userId = decodedToken.id;
+      } catch (error) {
+        console.error('JWT verification failed:', error.message);
+      }
+    }
+    return this.cartService.clearCart(userId, cartId);
   }
+
   @Public()
   @Post('add')
   async addToCart(
-    @Body('userId') userId: string | null,
-    @Body('sessionId') sessionId: string | null,
+    @Req() req: any,
     @Body('productId') productId: string,
     @Body('amount') amount: number,
-  ): Promise<{ message: string; CartInformation: CartDto }> {
-    const result = await this.cartService.addToCart(
-      userId,
-      sessionId,
-      productId,
-      amount,
-    );
-    return {
-      message: 'Product added to cart successfully',
-      CartInformation: result.cartItem,
-    };
-  }
-
-  @Post('merge')
-  async mergeCart(
-    @Body('sessionId') sessionId: string | null,
-    @Body('userId') userId: string,
-  ): Promise<{ message: string }> {
-    if (!sessionId || !userId) {
-      throw new BadRequestException('sessionId and userId are required');
+  ): Promise<{ message: string; cartItem: CartDto }> {
+    let userId: string | null = null;
+    const authHeader = req.headers.authorization;
+    if (authHeader) {
+      const token = authHeader.split(' ')[1];
+      try {
+        const decodedToken = this.jwtService.verify(token, {
+          secret: process.env.JWT_SECRET,
+        });
+        userId = decodedToken.id;
+      } catch (error) {
+        console.error('JWT verification failed:', error.message);
+      }
     }
-
-    return this.cartService.mergeCart(sessionId, userId);
+    const result = await this.cartService.addToCart(userId, productId, amount);
+    return result;
   }
+
+  // @Post('merge')
+  // async mergeCart(
+  //   @Body('sessionId') sessionId: string | null,
+  //   @Body('userId') userId: string,
+  // ): Promise<{ message: string }> {
+  //   if (!sessionId || !userId) {
+  //     throw new BadRequestException('sessionId and userId are required');
+  //   }
+
+  //   return this.cartService.mergeCart(sessionId, userId);
+  // }
 }
