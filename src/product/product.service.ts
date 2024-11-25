@@ -63,7 +63,12 @@ export class ProductService {
           },
         ],
       },
-      include: {
+      select: {
+        id: true,
+        name: true,
+        price: true,
+        description: true,
+        // Các trường khác mà bạn muốn
         directus_files: {
           select: {
             filename_disk: true,
@@ -75,8 +80,22 @@ export class ProductService {
       },
     });
 
+    const productsWithUrls = await Promise.all(
+      products.map(async (product) => {
+        const filename = product.directus_files?.filename_disk || '';
+        const publicUrl = filename ? await SupabaseUtil.GetPublicImageUrl(filename) : '';
+        return {
+          id: product.id,
+          name: product.name,
+          price: (product.price as Decimal).toNumber(),
+          description: product.description,
+          imageUrl: publicUrl,
+        };
+      }),
+    );
+
     return {
-      data: products,
+      data: productsWithUrls,
     };
   }
 
@@ -96,14 +115,14 @@ export class ProductService {
         },
       },
     });
-  
+
     if (!dataPro) {
-      throw new Error("Product not found");
+      throw new Error('Product not found');
     }
-  
+
     const url = dataPro.directus_files?.filename_disk || '';
     const urlPublic = url ? await SupabaseUtil.GetPublicImageUrl(url) : '';
-  
+
     // Chuyển đổi `Decimal` thành `number` cho `price` nếu cần
     const productDetail: GetDetailProduct = {
       id: dataPro.id,
@@ -113,7 +132,7 @@ export class ProductService {
       token_id: dataPro.token_id,
       imageUrl: urlPublic, // Gán URL công khai của ảnh
     };
-  
+
     return productDetail;
   }
 }
