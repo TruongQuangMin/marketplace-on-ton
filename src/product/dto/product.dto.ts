@@ -32,11 +32,11 @@ export interface SearchingProduct {
 }
 
 export interface ProductResponseType {
-  data: ProductResponseType1[]
+  data: GetAllProduct[]
 }
 
 
-export interface ProductResponseType1 {
+export interface GetAllProduct {
   id: string;
   name: string;
   price: number;
